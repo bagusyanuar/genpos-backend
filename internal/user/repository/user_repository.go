@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/bagusyanuar/genpos-backend/internal/user/domain"
 	"github.com/google/uuid"
@@ -32,19 +33,33 @@ func (r *userRepository) FindByID(ctx context.Context, id uuid.UUID) (*domain.Us
 	return &user, nil
 }
 
-func (r *userRepository) Find(ctx context.Context, limit, offset int) ([]*domain.User, int64, error) {
+func (r *userRepository) Find(ctx context.Context, filter domain.UserFilter) ([]*domain.User, int64, error) {
 	var users []*domain.User
 	var total int64
 
+	db := r.db.WithContext(ctx).Model(&domain.User{})
+
+	if filter.Search != "" {
+		search := fmt.Sprintf("%%%s%%", filter.Search)
+		db = db.Where("email LIKE ? OR username LIKE ?", search, search)
+	}
+
 	// Get total count
-	if err := r.db.WithContext(ctx).Model(&domain.User{}).Count(&total).Error; err != nil {
+	if err := db.Count(&total).Error; err != nil {
 		return nil, 0, err
 	}
 
 	// Get paginated data
-	if err := r.db.WithContext(ctx).Limit(limit).Offset(offset).Find(&users).Error; err != nil {
+	if err := db.Limit(filter.GetLimit()).Offset(filter.GetOffset()).Order(filter.GetSort()).Find(&users).Error; err != nil {
 		return nil, 0, err
 	}
 
 	return users, total, nil
+}
+
+func (r *userRepository) Create(ctx context.Context, user *domain.User) error {
+	if err := r.db.WithContext(ctx).Create(user).Error; err != nil {
+		return err
+	}
+	return nil
 }

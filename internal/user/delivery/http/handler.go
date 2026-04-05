@@ -1,11 +1,10 @@
 package http
 
 import (
-	"strconv"
-
 	"github.com/bagusyanuar/genpos-backend/internal/shared/config"
 	"github.com/bagusyanuar/genpos-backend/internal/user/domain"
 	"github.com/bagusyanuar/genpos-backend/pkg/response"
+	"github.com/bagusyanuar/genpos-backend/pkg/validator"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"go.uber.org/zap"
@@ -29,13 +28,21 @@ func (h *UserHandler) Register(router fiber.Router, authMiddleware fiber.Handler
 
 	group.Get("/", h.Find)
 	group.Get("/:id", h.GetByID)
+	group.Post("/", h.Create)
 }
 
 func (h *UserHandler) Find(c *fiber.Ctx) error {
-	page, _ := strconv.Atoi(c.Query("page", "1"))
-	limit, _ := strconv.Atoi(c.Query("limit", "10"))
+	var query FindUserQuery
+	if err := c.QueryParser(&query); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(response.Error("invalid query parameters"))
+	}
 
-	users, total, err := h.uc.Find(c.Context(), page, limit)
+	filter := domain.UserFilter{
+		Search:          query.Search,
+		PaginationParam: query.PaginationParam,
+	}
+
+	users, total, err := h.uc.Find(c.Context(), filter)
 	if err != nil {
 		config.Log.Error("handler.Find error", zap.Error(err))
 		return c.Status(fiber.StatusInternalServerError).JSON(response.Error(err.Error()))
@@ -52,10 +59,10 @@ func (h *UserHandler) Find(c *fiber.Ctx) error {
 	}
 
 	pagination := response.Pagination{
-		CurrentPage: page,
-		Limit:       limit,
+		CurrentPage: query.GetPage(),
+		Limit:       query.GetLimit(),
 		TotalData:   total,
-		TotalPage:   int((total + int64(limit) - 1) / int64(limit)),
+		TotalPage:   int((total + int64(query.GetLimit()) - 1) / int64(query.GetLimit())),
 	}
 
 	return c.Status(fiber.StatusOK).JSON(response.SuccessWithPagination(res, pagination, "users found successfully"))
@@ -82,4 +89,35 @@ func (h *UserHandler) GetByID(c *fiber.Ctx) error {
 	}
 
 	return c.Status(fiber.StatusOK).JSON(response.Success(res, "user fetched successfully"))
+}
+
+func (h *UserHandler) Create(c *fiber.Ctx) error {
+	var req CreateUserRequest
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(response.Error("invalid request body"))
+	}
+
+	if errs := validator.Validate(req); errs != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(response.ErrorWithDetails("validation error", errs))
+	}
+
+	user := &domain.User{
+		Email:    req.Email,
+		Username: req.Username,
+		Password: req.Password,
+	}
+
+	if err := h.uc.Create(c.Context(), user); err != nil {
+		config.Log.Error("handler.Create error", zap.Error(err))
+		return c.Status(fiber.StatusInternalServerError).JSON(response.Error(err.Error()))
+	}
+
+	res := UserResponse{
+		ID:        user.ID.String(),
+		Email:     user.Email,
+		Username:  user.Username,
+		CreatedAt: user.CreatedAt,
+	}
+
+	return c.Status(fiber.StatusCreated).JSON(response.Success(res, "user created successfully"))
 }

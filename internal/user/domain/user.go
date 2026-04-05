@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/bagusyanuar/genpos-backend/pkg/request"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
@@ -27,15 +28,23 @@ func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
 	return
 }
 
+// UserFilter represents criteria for user data operations.
+type UserFilter struct {
+	Search string
+	request.PaginationParam
+}
+
 // UserRepository defines the interface for user data operations.
 type UserRepository interface {
 	FindByEmail(ctx context.Context, email string) (*User, error)
 	FindByID(ctx context.Context, id uuid.UUID) (*User, error)
-	Find(ctx context.Context, limit, offset int) ([]*User, int64, error)
+	Find(ctx context.Context, filter UserFilter) ([]*User, int64, error)
+	Create(ctx context.Context, user *User) error
 }
 
 // UserUsecase defines the interface for user business logic.
 type UserUsecase interface {
-	Find(ctx context.Context, page, limit int) ([]*User, int64, error)
+	Find(ctx context.Context, filter UserFilter) ([]*User, int64, error)
 	FindByID(ctx context.Context, id uuid.UUID) (*User, error)
+	Create(ctx context.Context, user *User) error
 }

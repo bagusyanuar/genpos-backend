@@ -8,6 +8,7 @@ import (
 	"github.com/bagusyanuar/genpos-backend/internal/user/domain"
 	"github.com/google/uuid"
 	"go.uber.org/zap"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type userUsecase struct {
@@ -22,22 +23,12 @@ func NewUserUsecase(userRepo domain.UserRepository, conf *config.Config) domain.
 	}
 }
 
-func (u *userUsecase) Find(ctx context.Context, page, limit int) ([]*domain.User, int64, error) {
-	if page < 1 {
-		page = 1
-	}
-	if limit < 1 {
-		limit = 10
-	}
-
-	offset := (page - 1) * limit
-
-	users, total, err := u.userRepo.Find(ctx, limit, offset)
+func (u *userUsecase) Find(ctx context.Context, filter domain.UserFilter) ([]*domain.User, int64, error) {
+	users, total, err := u.userRepo.Find(ctx, filter)
 	if err != nil {
 		config.Log.Error("failed to find users",
 			zap.Error(err),
-			zap.Int("page", page),
-			zap.Int("limit", limit),
+			zap.Any("filter", filter),
 		)
 		return nil, 0, fmt.Errorf("user_usecase.Find: %w", err)
 	}
@@ -56,4 +47,23 @@ func (u *userUsecase) FindByID(ctx context.Context, id uuid.UUID) (*domain.User,
 	}
 
 	return user, nil
+}
+
+func (u *userUsecase) Create(ctx context.Context, user *domain.User) error {
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+	if err != nil {
+		config.Log.Error("failed to hash password", zap.Error(err))
+		return fmt.Errorf("user_usecase.Create (hash): %w", err)
+	}
+	user.Password = string(hashedPassword)
+
+	if err := u.userRepo.Create(ctx, user); err != nil {
+		config.Log.Error("failed to create user in repository",
+			zap.Error(err),
+			zap.String("email", user.Email),
+		)
+		return fmt.Errorf("user_usecase.Create: %w", err)
+	}
+
+	return nil
 }
