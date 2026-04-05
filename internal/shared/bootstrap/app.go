@@ -2,15 +2,15 @@ package bootstrap
 
 import (
 	"errors"
-	"log"
 
 	"github.com/bagusyanuar/genpos-backend/internal/config"
 	"github.com/bagusyanuar/genpos-backend/internal/shared/container"
 	"github.com/bagusyanuar/genpos-backend/internal/shared/middleware"
 	"github.com/bagusyanuar/genpos-backend/pkg/response"
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
+	"github.com/gofiber/fiber/v2/middleware/requestid"
+	"go.uber.org/zap"
 )
 
 func Start(conf *config.Config, deps *container.Container) {
@@ -28,8 +28,9 @@ func Start(conf *config.Config, deps *container.Container) {
 	})
 
 	// Global Middlewares
-	app.Use(logger.New())
-	app.Use(recover.New())
+	app.Use(requestid.New())   // 1. Generate Request ID
+	app.Use(middleware.Logger(conf)) // 2. Log using custom Zap middleware
+	app.Use(recover.New())     // 3. Panic recovery
 
 	// Register Routes
 	api := app.Group("/api/v1")
@@ -40,8 +41,8 @@ func Start(conf *config.Config, deps *container.Container) {
 	deps.AuthHandler.Register(api, jwtMiddleware)
 
 	// Start Server
-	log.Printf("Server starting on port %s", conf.AppPort)
+	config.Log.Info("Server is starting...", zap.String("port", conf.AppPort))
 	if err := app.Listen(":" + conf.AppPort); err != nil {
-		log.Fatalf("Failed to start server: %v", err)
+		config.Log.Fatal("Failed to start server", zap.Error(err))
 	}
 }
