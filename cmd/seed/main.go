@@ -3,9 +3,9 @@ package main
 import (
 	"log"
 
-	"github.com/bagusyanuar/genpos-backend/internal/auth/repository"
 	"github.com/bagusyanuar/genpos-backend/internal/config"
 	"github.com/bagusyanuar/genpos-backend/internal/shared/database"
+	"github.com/bagusyanuar/genpos-backend/internal/user/repository"
 )
 
 func main() {

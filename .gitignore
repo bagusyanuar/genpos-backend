@@ -33,3 +33,4 @@ Thumbs.db
 tmp/
 bin/
 logs/
+.logs/

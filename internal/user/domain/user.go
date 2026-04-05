@@ -8,7 +8,7 @@ import (
 	"gorm.io/gorm"
 )
 
-// User represents the authentication user entity.
+// User represents the core user entity.
 type User struct {
 	ID        uuid.UUID      `gorm:"type:uuid;primaryKey" json:"id"`
 	Email     string         `gorm:"type:varchar(100);unique;not null" json:"email"`
@@ -27,20 +27,8 @@ func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
 	return
 }
 
-// AuthRepository defines the interface for authentication data operations.
-type AuthRepository interface {
+// UserRepository defines the interface for user data operations.
+type UserRepository interface {
 	FindByEmail(ctx context.Context, email string) (*User, error)
 	FindByID(ctx context.Context, id uuid.UUID) (*User, error)
-}
-
-// TokenPair holds the access and refresh token pair.
-type TokenPair struct {
-	AccessToken  string
-	RefreshToken string
-}
-
-// AuthUsecase defines the interface for authentication business logic.
-type AuthUsecase interface {
-	Login(ctx context.Context, email, password string) (TokenPair, error)
-	RefreshToken(ctx context.Context, refreshToken string) (TokenPair, error)
 }

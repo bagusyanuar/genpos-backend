@@ -3,7 +3,7 @@ package repository
 import (
 	"log"
 
-	"github.com/bagusyanuar/genpos-backend/internal/auth/domain"
+	"github.com/bagusyanuar/genpos-backend/internal/user/domain"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )

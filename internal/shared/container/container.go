@@ -1,22 +1,24 @@
 package container
 
 import (
-	"github.com/bagusyanuar/genpos-backend/internal/auth/delivery/http"
-	"github.com/bagusyanuar/genpos-backend/internal/auth/repository"
-	"github.com/bagusyanuar/genpos-backend/internal/auth/usecase"
+	authHttp "github.com/bagusyanuar/genpos-backend/internal/auth/delivery/http"
+	authUsecase "github.com/bagusyanuar/genpos-backend/internal/auth/usecase"
 	"github.com/bagusyanuar/genpos-backend/internal/config"
+	userRepository "github.com/bagusyanuar/genpos-backend/internal/user/repository"
 	"gorm.io/gorm"
 )
 
 type Container struct {
-	AuthHandler *http.AuthHandler
+	AuthHandler *authHttp.AuthHandler
 }
 
 func NewContainer(db *gorm.DB, conf *config.Config) *Container {
+	// User Module Wiring
+	userRepo := userRepository.NewUserRepository(db)
+
 	// Auth Module Wiring
-	authRepo := repository.NewAuthRepository(db)
-	authUC := usecase.NewAuthUsecase(authRepo, conf)
-	authHandler := http.NewAuthHandler(authUC, conf)
+	authUC := authUsecase.NewAuthUsecase(userRepo, conf)
+	authHandler := authHttp.NewAuthHandler(authUC, conf)
 
 	return &Container{
 		AuthHandler: authHandler,

@@ -3,20 +3,20 @@ package repository
 import (
 	"context"
 
-	"github.com/bagusyanuar/genpos-backend/internal/auth/domain"
+	"github.com/bagusyanuar/genpos-backend/internal/user/domain"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
-type authRepository struct {
+type userRepository struct {
 	db *gorm.DB
 }
 
-func NewAuthRepository(db *gorm.DB) domain.AuthRepository {
-	return &authRepository{db: db}
+func NewUserRepository(db *gorm.DB) domain.UserRepository {
+	return &userRepository{db: db}
 }
 
-func (r *authRepository) FindByEmail(ctx context.Context, email string) (*domain.User, error) {
+func (r *userRepository) FindByEmail(ctx context.Context, email string) (*domain.User, error) {
 	var user domain.User
 	if err := r.db.WithContext(ctx).Where("email = ?", email).First(&user).Error; err != nil {
 		return nil, err
@@ -24,7 +24,7 @@ func (r *authRepository) FindByEmail(ctx context.Context, email string) (*domain
 	return &user, nil
 }
 
-func (r *authRepository) FindByID(ctx context.Context, id uuid.UUID) (*domain.User, error) {
+func (r *userRepository) FindByID(ctx context.Context, id uuid.UUID) (*domain.User, error) {
 	var user domain.User
 	if err := r.db.WithContext(ctx).Where("id = ?", id).First(&user).Error; err != nil {
 		return nil, err
