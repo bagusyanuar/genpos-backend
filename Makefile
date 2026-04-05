@@ -43,3 +43,7 @@ migrate-status: ## Show migration status
 migrate-drop: ## Drop all tables in the database (CAUTION)
 	@echo "Dropping all tables..."
 	@$(MIGRATE) -path $(MIGRATION_PATH) -database "$(DB_URL)" drop -f
+
+db-seed: ## Seed the database with initial data
+	@echo "Seeding database..."
+	@go run cmd/seed/main.go

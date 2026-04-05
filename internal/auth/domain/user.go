@@ -30,9 +30,17 @@ func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
 // AuthRepository defines the interface for authentication data operations.
 type AuthRepository interface {
 	FindByEmail(ctx context.Context, email string) (*User, error)
+	FindByID(ctx context.Context, id uuid.UUID) (*User, error)
+}
+
+// TokenPair holds the access and refresh token pair.
+type TokenPair struct {
+	AccessToken  string
+	RefreshToken string
 }
 
 // AuthUsecase defines the interface for authentication business logic.
 type AuthUsecase interface {
-	Login(ctx context.Context, email, password string) (string, error)
+	Login(ctx context.Context, email, password string) (TokenPair, error)
+	RefreshToken(ctx context.Context, refreshToken string) (TokenPair, error)
 }

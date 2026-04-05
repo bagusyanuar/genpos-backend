@@ -14,7 +14,7 @@ func main() {
 	db := config.InitDB(conf)
 
 	// 3. Initialize Dependency Container
-	deps := container.NewContainer(db)
+	deps := container.NewContainer(db, conf)
 
 	// 4. Start Application
 	bootstrap.Start(conf, deps)

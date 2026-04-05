@@ -18,6 +18,12 @@ type Config struct {
 	DBUser     string `mapstructure:"DB_USER"`
 	DBPassword string `mapstructure:"DB_PASSWORD"`
 	DBName     string `mapstructure:"DB_NAME"`
+ 
+	JWTSecret            string `mapstructure:"JWT_SECRET"`
+	JWTIssuer            string `mapstructure:"JWT_ISSUER"`
+	JWTExpiration        int    `mapstructure:"JWT_EXPIRATION"`
+	JWTRefreshSecret     string `mapstructure:"JWT_SECRET_REFRESH"`
+	JWTRefreshExpiration int    `mapstructure:"JWT_EXPIRATION_REFRESH"`
 }
 
 func LoadConfig() *Config {

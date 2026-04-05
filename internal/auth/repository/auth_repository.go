@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/bagusyanuar/genpos-backend/internal/auth/domain"
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -18,6 +19,14 @@ func NewAuthRepository(db *gorm.DB) domain.AuthRepository {
 func (r *authRepository) FindByEmail(ctx context.Context, email string) (*domain.User, error) {
 	var user domain.User
 	if err := r.db.WithContext(ctx).Where("email = ?", email).First(&user).Error; err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
+
+func (r *authRepository) FindByID(ctx context.Context, id uuid.UUID) (*domain.User, error) {
+	var user domain.User
+	if err := r.db.WithContext(ctx).Where("id = ?", id).First(&user).Error; err != nil {
 		return nil, err
 	}
 	return &user, nil
