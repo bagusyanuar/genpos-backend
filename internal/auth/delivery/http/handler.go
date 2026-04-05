@@ -7,6 +7,7 @@ import (
 	"github.com/bagusyanuar/genpos-backend/internal/shared/config"
 	"github.com/bagusyanuar/genpos-backend/pkg/response"
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 )
 
 type AuthHandler struct {
@@ -31,14 +32,22 @@ func (h *AuthHandler) Register(router fiber.Router, authMiddleware fiber.Handler
 }
 
 func (h *AuthHandler) Me(c *fiber.Ctx) error {
-	userID := c.Locals("user_id")
-	email := c.Locals("email")
-	roles := c.Locals("roles")
+	idStr := c.Locals("user_id").(string)
+	userID, err := uuid.Parse(idStr)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(response.Error("invalid user id in token"))
+	}
 
-	res := fiber.Map{
-		"user_id": userID,
-		"email":   email,
-		"roles":   roles,
+	user, err := h.uc.GetProfile(c.Context(), userID)
+	if err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(response.Error(err.Error()))
+	}
+
+	res := UserResponse{
+		ID:        user.ID.String(),
+		Email:     user.Email,
+		Username:  user.Username,
+		CreatedAt: user.CreatedAt.Format(time.RFC3339),
 	}
 	return c.Status(fiber.StatusOK).JSON(response.Success(res, "user profile retrieved"))
 }

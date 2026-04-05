@@ -122,3 +122,11 @@ func (u *authUsecase) RefreshToken(ctx context.Context, refreshToken string) (au
 		RefreshToken: newRefreshToken,
 	}, nil
 }
+
+func (u *authUsecase) GetProfile(ctx context.Context, userID uuid.UUID) (*userDomain.User, error) {
+	user, err := u.userRepo.FindByID(ctx, userID)
+	if err != nil {
+		return nil, errors.New("user not found")
+	}
+	return user, nil
+}
