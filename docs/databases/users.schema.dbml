@@ -1,0 +1,13 @@
+Table users {
+  id uuid [pk, note: "Primary Key menggunakan UUID v4"]
+  email varchar [unique, not null]
+  username varchar [unique, not null]
+  password varchar [not null]
+  
+  // Audit Fields
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+  deleted_at timestamp [note: "Soft delete support"]
+
+  Note: "Tabel utama untuk autentikasi user GENPOS"
+}
