@@ -1,0 +1,32 @@
+package bootstrap
+
+import (
+	"log"
+
+	"github.com/bagusyanuar/genpos-backend/internal/config"
+	"github.com/bagusyanuar/genpos-backend/internal/shared/container"
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/gofiber/fiber/v2/middleware/recover"
+)
+
+func Start(conf *config.Config, deps *container.Container) {
+	// Initialize Fiber app
+	app := fiber.New(fiber.Config{
+		AppName: conf.AppName,
+	})
+
+	// Global Middlewares
+	app.Use(logger.New())
+	app.Use(recover.New())
+
+	// Register Routes
+	api := app.Group("/api/v1")
+	deps.AuthHandler.Register(api)
+
+	// Start Server
+	log.Printf("Server starting on port %s", conf.AppPort)
+	if err := app.Listen(":" + conf.AppPort); err != nil {
+		log.Fatalf("Failed to start server: %v", err)
+	}
+}

@@ -1,7 +1,8 @@
-package delivery
+package http
 
 import (
 	"github.com/bagusyanuar/genpos-backend/internal/auth/domain"
+	"github.com/bagusyanuar/genpos-backend/pkg/response"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -26,14 +27,14 @@ func (h *AuthHandler) Login(c *fiber.Ctx) error {
 
 	var req loginRequest
 	if err := c.BodyParser(&req); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "invalid request"})
+		return c.Status(fiber.StatusBadRequest).JSON(response.Error("invalid request"))
 	}
 
 	token, err := h.uc.Login(c.Context(), req.Email, req.Password)
 	if err != nil {
-		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": err.Error()})
+		return c.Status(fiber.StatusUnauthorized).JSON(response.Error(err.Error()))
 	}
 
-	return c.JSON(fiber.Map{"token": token})
+	return c.Status(fiber.StatusOK).JSON(response.Success(fiber.Map{"token": token}, "login success"))
 }
 
