@@ -1,0 +1,11 @@
+# 🏁 Mode Super Irit Token
+
+- **Commands**: 
+  - `/create-usecase Module [NamaModule] buat fungsi [NamaFungsi]`
+  - "Implement [Fitur], gas/sikat." (Gaya "Telegraphic").
+- **Rules**:
+  - **Selective Context**: Cukup `@` file yang akan diedit/referensi utama. 
+  - **Modular Layering**: Fokus per layer (Domain -> Repo -> UC -> Handler).
+  - **Skip Summary**: Baca hasil kerja langsung di file/artifact.
+  - **Clean Chat**: Jangan bawa file sampah (.log, .env) ke context.
+  - **Plan Investment**: Gunakan Plan buat tugas belibet biar nggak banyak revisi boros.
