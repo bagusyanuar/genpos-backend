@@ -31,3 +31,20 @@ func (r *userRepository) FindByID(ctx context.Context, id uuid.UUID) (*domain.Us
 	}
 	return &user, nil
 }
+
+func (r *userRepository) Find(ctx context.Context, limit, offset int) ([]*domain.User, int64, error) {
+	var users []*domain.User
+	var total int64
+
+	// Get total count
+	if err := r.db.WithContext(ctx).Model(&domain.User{}).Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	// Get paginated data
+	if err := r.db.WithContext(ctx).Limit(limit).Offset(offset).Find(&users).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return users, total, nil
+}

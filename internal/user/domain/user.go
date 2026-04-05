@@ -31,4 +31,11 @@ func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
 type UserRepository interface {
 	FindByEmail(ctx context.Context, email string) (*User, error)
 	FindByID(ctx context.Context, id uuid.UUID) (*User, error)
+	Find(ctx context.Context, limit, offset int) ([]*User, int64, error)
+}
+
+// UserUsecase defines the interface for user business logic.
+type UserUsecase interface {
+	Find(ctx context.Context, page, limit int) ([]*User, int64, error)
+	FindByID(ctx context.Context, id uuid.UUID) (*User, error)
 }

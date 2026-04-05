@@ -39,6 +39,7 @@ func Start(conf *config.Config, deps *container.Container) {
 	jwtMiddleware := middleware.JWTProtected(conf)
 
 	deps.AuthHandler.Register(api, jwtMiddleware)
+	deps.UserHandler.Register(api, jwtMiddleware)
 
 	// Start Server
 	config.Log.Info("Server is starting...", zap.String("port", conf.AppPort))
