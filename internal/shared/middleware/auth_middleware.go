@@ -3,7 +3,7 @@ package middleware
 import (
 	"strings"
 
-	"github.com/bagusyanuar/genpos-backend/internal/config"
+	"github.com/bagusyanuar/genpos-backend/internal/shared/config"
 	"github.com/bagusyanuar/genpos-backend/pkg/jwt"
 	"github.com/bagusyanuar/genpos-backend/pkg/response"
 	"github.com/gofiber/fiber/v2"

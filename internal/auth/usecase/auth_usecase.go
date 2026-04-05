@@ -6,7 +6,7 @@ import (
 	"time"
 
 	authDomain "github.com/bagusyanuar/genpos-backend/internal/auth/domain"
-	"github.com/bagusyanuar/genpos-backend/internal/config"
+	"github.com/bagusyanuar/genpos-backend/internal/shared/config"
 	userDomain "github.com/bagusyanuar/genpos-backend/internal/user/domain"
 	"github.com/bagusyanuar/genpos-backend/pkg/jwt"
 	"github.com/google/uuid"

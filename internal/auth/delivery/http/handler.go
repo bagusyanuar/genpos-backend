@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/bagusyanuar/genpos-backend/internal/auth/domain"
-	"github.com/bagusyanuar/genpos-backend/internal/config"
+	"github.com/bagusyanuar/genpos-backend/internal/shared/config"
 	"github.com/bagusyanuar/genpos-backend/pkg/response"
 	"github.com/gofiber/fiber/v2"
 )

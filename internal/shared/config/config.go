@@ -18,7 +18,7 @@ type Config struct {
 	DBUser     string `mapstructure:"DB_USER"`
 	DBPassword string `mapstructure:"DB_PASSWORD"`
 	DBName     string `mapstructure:"DB_NAME"`
- 
+
 	JWTSecret            string `mapstructure:"JWT_SECRET"`
 	JWTIssuer            string `mapstructure:"JWT_ISSUER"`
 	JWTExpiration        int    `mapstructure:"JWT_EXPIRATION"`

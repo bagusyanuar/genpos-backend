@@ -3,7 +3,7 @@ package middleware
 import (
 	"time"
 
-	"github.com/bagusyanuar/genpos-backend/internal/config"
+	"github.com/bagusyanuar/genpos-backend/internal/shared/config"
 	"github.com/gofiber/fiber/v2"
 	"go.uber.org/zap"
 )

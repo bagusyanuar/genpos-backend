@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/bagusyanuar/genpos-backend/internal/config"
 	"github.com/bagusyanuar/genpos-backend/internal/shared/bootstrap"
+	"github.com/bagusyanuar/genpos-backend/internal/shared/config"
 	"github.com/bagusyanuar/genpos-backend/internal/shared/container"
 	"go.uber.org/zap"
 )

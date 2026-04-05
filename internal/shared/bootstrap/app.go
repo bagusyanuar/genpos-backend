@@ -3,7 +3,7 @@ package bootstrap
 import (
 	"errors"
 
-	"github.com/bagusyanuar/genpos-backend/internal/config"
+	"github.com/bagusyanuar/genpos-backend/internal/shared/config"
 	"github.com/bagusyanuar/genpos-backend/internal/shared/container"
 	"github.com/bagusyanuar/genpos-backend/internal/shared/middleware"
 	"github.com/bagusyanuar/genpos-backend/pkg/response"

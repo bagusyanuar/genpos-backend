@@ -3,7 +3,7 @@ package container
 import (
 	authHttp "github.com/bagusyanuar/genpos-backend/internal/auth/delivery/http"
 	authUsecase "github.com/bagusyanuar/genpos-backend/internal/auth/usecase"
-	"github.com/bagusyanuar/genpos-backend/internal/config"
+	"github.com/bagusyanuar/genpos-backend/internal/shared/config"
 	userRepository "github.com/bagusyanuar/genpos-backend/internal/user/repository"
 	"gorm.io/gorm"
 )
