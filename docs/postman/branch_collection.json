@@ -1,0 +1,182 @@
+{
+	"info": {
+		"_postman_id": "genpos-branch-module",
+		"name": "GenPOS - Branch Module",
+		"description": "Endpoints for managing branches in GenPOS system",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Find Branches",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{auth_token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/branches?search=&page=1&limit=10&sort=name asc",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"branches"
+					],
+					"query": [
+						{
+							"key": "search",
+							"value": ""
+						},
+						{
+							"key": "page",
+							"value": "1"
+						},
+						{
+							"key": "limit",
+							"value": "10"
+						},
+						{
+							"key": "sort",
+							"value": "name asc"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Branch By ID",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{auth_token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/branches/:id",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"branches",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "uuid-here"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Branch",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{auth_token}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Cabang Utama\",\n    \"is_default\": true\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/branches",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"branches"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Branch",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{auth_token}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Cabang Diupdate\",\n    \"is_default\": false\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/branches/:id",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"branches",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "uuid-here"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Branch",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{auth_token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/branches/:id",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"branches",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "uuid-here"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

@@ -2,36 +2,29 @@ package container
 
 import (
 	authHttp "github.com/bagusyanuar/genpos-backend/internal/auth/delivery/http"
-	authUsecase "github.com/bagusyanuar/genpos-backend/internal/auth/usecase"
+	branchHttp "github.com/bagusyanuar/genpos-backend/internal/branch/delivery/http"
+	branchDomain "github.com/bagusyanuar/genpos-backend/internal/branch/domain"
 	"github.com/bagusyanuar/genpos-backend/internal/shared/config"
 	userHttp "github.com/bagusyanuar/genpos-backend/internal/user/delivery/http"
-	userRepository "github.com/bagusyanuar/genpos-backend/internal/user/repository"
-	userUsecase "github.com/bagusyanuar/genpos-backend/internal/user/usecase"
 	userDomain "github.com/bagusyanuar/genpos-backend/internal/user/domain"
 	"gorm.io/gorm"
 )
 
 type Container struct {
-	AuthHandler *authHttp.AuthHandler
-	UserUC      userDomain.UserUsecase
-	UserHandler *userHttp.UserHandler
+	AuthHandler   *authHttp.AuthHandler
+	UserUC        userDomain.UserUsecase
+	UserHandler   *userHttp.UserHandler
+	BranchUC      branchDomain.BranchUsecase
+	BranchHandler *branchHttp.BranchHandler
 }
 
 func NewContainer(db *gorm.DB, conf *config.Config) *Container {
-	// User Module Wiring
-	userRepo := userRepository.NewUserRepository(db)
+	c := &Container{}
 
-	// Auth Module Wiring
-	authUC := authUsecase.NewAuthUsecase(userRepo, conf)
-	authHandler := authHttp.NewAuthHandler(authUC, conf)
+	// Wiring modules (delegated to modular files)
+	userRepo := c.wireUserModule(db, conf)
+	c.wireAuthModule(userRepo, conf)
+	c.wireBranchModule(db, conf)
 
-	// User Module Usecase Wiring
-	userUC := userUsecase.NewUserUsecase(userRepo, conf)
-	userHandler := userHttp.NewUserHandler(userUC, conf)
-
-	return &Container{
-		AuthHandler: authHandler,
-		UserUC:      userUC,
-		UserHandler: userHandler,
-	}
+	return c
 }
