@@ -1,0 +1,9 @@
+Table branches {
+  id uuid [pk : uuid v4]
+  name varchar [not null]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+  deleted_at timestamp [note: "Soft delete support"]
+
+  Note: "Tabel untuk menyimpan data cabang"
+}
