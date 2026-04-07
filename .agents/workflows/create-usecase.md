@@ -2,7 +2,7 @@
 description: Create Usecase
 ---
 
-1. **Domain**: `.../domain/[m].go` (Interfaces ONLY, NO entity).
+1. **Domain**: `.../domain/[m].go` (Interfaces). STRICT: Only requested methods. NO Entity.
 2. **Logic**: `.../usecase/[m]_usecase.go`. Wrap: `fmt.Errorf("[m]_uc.[fn]: %w", err)`. Log: `config.Log.Error`.
 3. **DTO**: `.../delivery/http/dto.go`.
 4. **Handler**: `.../delivery/http/handler.go`.

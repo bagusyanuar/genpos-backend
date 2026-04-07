@@ -42,6 +42,7 @@ func Start(conf *config.Config, deps *container.Container) {
 	deps.UserHandler.Register(api, jwtMiddleware)
 	deps.BranchHandler.Register(api, jwtMiddleware)
 	deps.UnitHandler.Register(api, jwtMiddleware)
+	deps.CategoryHandler.Register(api, jwtMiddleware)
 
 	// Start Server
 	config.Log.Info("Server is starting...", zap.String("port", conf.AppPort))

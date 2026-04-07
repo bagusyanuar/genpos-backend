@@ -1,0 +1,30 @@
+Table categories {
+  id uuid [pk, default: `gen_random_uuid()`]
+  
+  // Hierarchical Fields
+  parent_id uuid [ref: > categories.id, null, note: "Self-reference untuk nested 3 level"]
+  level integer [default: 0, note: "0: Root, 1: Category, 2: Sub-Category"]
+  
+  // Core Information
+  name varchar(100) [not null]
+  slug varchar(100) [null, note: "Unique identifier for URL/API"]
+  description text [null]
+  
+  // Discriminator & UI
+  type varchar(20) [default: 'PRODUCT', note: 'Values: PRODUCT, INGREDIENT, ALL']
+  image_url text [null]
+  sort_order integer [default: 0]
+  
+  // Status & Audit Trail
+  is_active boolean [default: true]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+  deleted_at timestamp [null, note: "Soft delete support"]
+
+  indexes {
+    parent_id
+    (slug) [unique]
+    (type, is_active)
+    (parent_id, sort_order) // Untuk sorting cepat di level yang sama
+  }
+}

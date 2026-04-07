@@ -4,6 +4,8 @@ import (
 	authHttp "github.com/bagusyanuar/genpos-backend/internal/auth/delivery/http"
 	branchHttp "github.com/bagusyanuar/genpos-backend/internal/branch/delivery/http"
 	branchDomain "github.com/bagusyanuar/genpos-backend/internal/branch/domain"
+	categoryHttp "github.com/bagusyanuar/genpos-backend/internal/category/delivery/http"
+	categoryDomain "github.com/bagusyanuar/genpos-backend/internal/category/domain"
 	"github.com/bagusyanuar/genpos-backend/internal/shared/config"
 	unitHttp "github.com/bagusyanuar/genpos-backend/internal/unit/delivery/http"
 	unitDomain "github.com/bagusyanuar/genpos-backend/internal/unit/domain"
@@ -20,6 +22,8 @@ type Container struct {
 	BranchHandler *branchHttp.BranchHandler
 	UnitUC        unitDomain.UnitUsecase
 	UnitHandler   *unitHttp.UnitHandler
+	CategoryUC      categoryDomain.CategoryUsecase
+	CategoryHandler *categoryHttp.CategoryHandler
 }
 
 func NewContainer(db *gorm.DB, conf *config.Config) *Container {
@@ -30,6 +34,7 @@ func NewContainer(db *gorm.DB, conf *config.Config) *Container {
 	c.wireAuthModule(userRepo, conf)
 	c.wireBranchModule(db, conf)
 	c.wireUnitModule(db, conf)
+	c.wireCategoryModule(db, conf)
 
 	return c
 }
