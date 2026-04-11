@@ -8,7 +8,7 @@ Untuk mempermudah input data bahan baku yang kompleks, proses **Creation** akan 
 
 ### Step 1: General Information
 - Input data profil material.
-- Field: `Name`, `SKU`, `Category`, `Material Type` (RAW/SEMI_FINISHED), `Image`.
+- Field: `Name`, `SKU`, `Category`, `Material Type` (RAW/SEMI_FINISHED).
 - Status: Draft (belum disimpan ke DB).
 
 ### Step 2: Units & Conversions (UOM)
@@ -20,8 +20,14 @@ Untuk mempermudah input data bahan baku yang kompleks, proses **Creation** akan 
     - User input `Multiplier` (misal: 1 Pack = 1000 Gram).
 - API Call: `POST /api/v1/materials` (Atomic Create - Simpan Material + UOMs sekaligus).
 
-### Step 3: Review & Summary
-- Konfirmasi data sebelum finalisasi.
+### Step 3: Upload Image (Optional)
+- Proses upload foto barang.
+- Dilakukan setelah Material ID didapatkan dari Step 2.
+- User bisa skip jika belum ada foto.
+- API Call: `PATCH /api/v1/materials/:id/image` (`multipart/form-data`).
+
+### Step 4: Finish & Review
+- Konfirmasi akhir dan ringkasan data.
 
 ---
 

@@ -5,9 +5,10 @@ Dokumen ini mencatat rencana pengembangan fitur setelah implementasi Atomic Crea
 ## 📦 Phase 1: Material Lifecycle (CRUD Completion)
 Melengkapi fungsionalitas dasar Material agar siap digunakan secara operasional.
 
-- [ ] **Update Material**: 
+- [/] **Update Material**: 
     - Mendukung update metadata (nama, kategori, tipe, is_active).
-    - Mendukung update foto (interaksi dengan `pkg/fileupload` untuk hapus foto lama).
+    - [NEW] **Patch Image Flow**: Proses upload foto dilakukan di step terakhir atau secara terpisah via `PATCH /materials/:id/image`.
+    - Mendukung hapus foto lama secara otomatis jika diganti (interaksi dengan `pkg/fileupload`).
 - [ ] **Update Material UOMs**: Manajemen penambahan atau perubahan konversi satuan.
 - [ ] **Delete Material**: Implementasi *Soft Delete* untuk menjaga integritas data pada resep (BOM) yang sudah ada.
 
