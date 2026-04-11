@@ -1,0 +1,18 @@
+Table material_uoms {
+  id uuid [pk]
+  material_id uuid [not null]
+  unit_id uuid [not null]
+  multiplier decimal(15, 4) [not null, default: 1, note: "Conversion factor. 1 this unit = multiplier * base unit"]
+  is_default boolean [not null, default: false, note: "True if this is the Base Unit (Smallest unit for stock)"]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp
+
+  Indexes {
+    (material_id, unit_id) [unique, name: 'idx_material_uoms_unique']
+    material_id [name: 'idx_material_uoms_material_id']
+    (material_id, is_default) [name: 'idx_material_uoms_default']
+  }
+}
+
+Ref: material_uoms.material_id > materials.id
+Ref: material_uoms.unit_id > units.id

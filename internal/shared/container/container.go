@@ -11,6 +11,10 @@ import (
 	unitDomain "github.com/bagusyanuar/genpos-backend/internal/unit/domain"
 	userHttp "github.com/bagusyanuar/genpos-backend/internal/user/delivery/http"
 	userDomain "github.com/bagusyanuar/genpos-backend/internal/user/domain"
+	materialHttp "github.com/bagusyanuar/genpos-backend/internal/material/delivery/http"
+	materialDomain "github.com/bagusyanuar/genpos-backend/internal/material/domain"
+	inventoryHttp "github.com/bagusyanuar/genpos-backend/internal/inventory/delivery/http"
+	inventoryDomain "github.com/bagusyanuar/genpos-backend/internal/inventory/domain"
 	"gorm.io/gorm"
 )
 
@@ -24,6 +28,10 @@ type Container struct {
 	UnitHandler   *unitHttp.UnitHandler
 	CategoryUC      categoryDomain.CategoryUsecase
 	CategoryHandler *categoryHttp.CategoryHandler
+	MaterialUC      materialDomain.MaterialUsecase
+	MaterialHandler *materialHttp.MaterialHandler
+	InventoryUC      inventoryDomain.InventoryUsecase
+	InventoryHandler *inventoryHttp.InventoryHandler
 }
 
 func NewContainer(db *gorm.DB, conf *config.Config) *Container {
@@ -35,6 +43,8 @@ func NewContainer(db *gorm.DB, conf *config.Config) *Container {
 	c.wireBranchModule(db, conf)
 	c.wireUnitModule(db, conf)
 	c.wireCategoryModule(db, conf)
+	c.wireMaterialModule(db, conf)
+	c.wireInventoryModule(db, conf)
 
 	return c
 }

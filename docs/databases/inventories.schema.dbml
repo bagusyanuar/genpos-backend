@@ -1,0 +1,22 @@
+Table inventories {
+  id uuid [pk]
+  material_id uuid [not null]
+  branch_id uuid [not null]
+  stock decimal(15, 2) [not null, default: 0, note: "Current stock level (Strictly in Base Unit)"]
+  min_stock decimal(15, 2) [not null, default: 0, note: "Reorder point (Strictly in Base Unit)"]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp
+  deleted_at timestamp
+
+  Indexes {
+    // Unique constraint per Branch and Material
+    (material_id, branch_id) [unique, name: 'idx_inventories_material_branch']
+    
+    branch_id [name: 'idx_inventories_branch_id']
+    material_id [name: 'idx_inventories_material_id']
+    deleted_at [name: 'idx_inventories_deleted_at']
+  }
+}
+
+// Relationship to materials
+Ref: inventories.material_id > materials.id

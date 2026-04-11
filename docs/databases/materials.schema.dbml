@@ -1,0 +1,16 @@
+Table materials {
+  id uuid [pk]
+  sku varchar(50) [not null, unique, note: "Unique Operational Key"]
+  name varchar(255) [not null]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp
+  deleted_at timestamp [note: "Soft Delete untuk menjaga relasi resep (BOM)"]
+
+  Indexes {
+    sku [name: 'idx_materials_sku']
+    
+    // B-Tree Index di deleted_at krusial karena hampir semua query BE 
+    // akan menggunakan "WHERE deleted_at IS NULL"
+    deleted_at [name: 'idx_materials_deleted_at']
+  }
+}

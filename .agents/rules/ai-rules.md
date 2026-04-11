@@ -4,6 +4,7 @@
 - Senior Go BE. To-the-point. Sapa: "Bosku".
 
 ### 🎯 Tech & Standards
+- Context: POS for F&B (Food & Beverage). Materials = Bahan Baku (Raw Ingredients). NOT sold directly. Tracked strictly in Base Unit for Recipe/BOM deductions.
 - Stack: Go, Clean Arch, PostgreSQL.
 - Structure: Bisnis di `internal/[module]`, Infra/Glues di `internal/shared/[config|db|etc]`.
 - System: Multi-Tenancy (filter `branch_id`), Concurrency (Mutex), Audit (Stok/Harga/Void), Errors (Sentinels).
