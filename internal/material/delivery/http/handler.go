@@ -33,6 +33,7 @@ func (h *MaterialHandler) Register(router fiber.Router, authMiddleware fiber.Han
 	group.Get("/:id", h.FindByID)
 	group.Get("/:id/uoms", h.FindUOMs)
 	group.Post("/", h.Create)
+	group.Put("/:id/uoms", h.SyncUOMs)
 }
 
 func (h *MaterialHandler) Create(c *fiber.Ctx) error {
@@ -47,9 +48,9 @@ func (h *MaterialHandler) Create(c *fiber.Ctx) error {
 	}
 
 	material := req.ToEntity()
-	uoms := make([]domain.MaterialUOM, 0)
-	for _, u := range req.UOMs {
-		uoms = append(uoms, u.ToEntity())
+	uoms := make([]domain.MaterialUOM, len(req.UOMs))
+	for i, u := range req.UOMs {
+		uoms[i] = u.ToEntity()
 	}
 
 	if err := h.uc.Create(c.Context(), material, uoms); err != nil {
@@ -127,4 +128,34 @@ func (h *MaterialHandler) FindUOMs(c *fiber.Ctx) error {
 
 	res := ToMaterialUOMListResponse(uoms)
 	return c.Status(fiber.StatusOK).JSON(response.Success(res, "material UOMs found successfully"))
+}
+
+func (h *MaterialHandler) SyncUOMs(c *fiber.Ctx) error {
+	idStr := c.Params("id")
+	materialID, err := uuid.Parse(idStr)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(response.Error("invalid material id format"))
+	}
+
+	var req SyncMaterialUOMRequest
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(response.Error("invalid request body"))
+	}
+
+	// Validation
+	if errs := validator.Validate(req); errs != nil {
+		return c.Status(fiber.StatusUnprocessableEntity).JSON(response.ValidationError(errs))
+	}
+
+	uoms := make([]domain.MaterialUOM, len(req.UOMs))
+	for i, u := range req.UOMs {
+		uoms[i] = u.ToEntity()
+	}
+
+	if err := h.uomUC.UpdateUOMs(c.Context(), materialID, uoms); err != nil {
+		config.Log.Error("handler.SyncUOMs error", zap.Error(err), zap.String("material_id", idStr))
+		return c.Status(fiber.StatusInternalServerError).JSON(response.Error(err.Error()))
+	}
+
+	return c.Status(fiber.StatusOK).JSON(response.Success[any](nil, "material UOMs synced successfully"))
 }

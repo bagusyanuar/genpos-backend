@@ -60,9 +60,6 @@ func (u *materialUsecase) Create(ctx context.Context, material *domain.Material,
 	// 5. Prepare UOMs with MaterialID and Save
 	for i := range uoms {
 		uoms[i].MaterialID = material.ID
-		if uoms[i].ID == uuid.Nil {
-			uoms[i].ID = uuid.New()
-		}
 	}
 
 	if err := tx.WithContext(ctx).Create(&uoms).Error; err != nil {

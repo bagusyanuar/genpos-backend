@@ -29,3 +29,36 @@ func (u *materialUOMUsecase) Find(ctx context.Context, materialID uuid.UUID) ([]
 
 	return uoms, nil
 }
+
+func (u *materialUOMUsecase) UpdateUOMs(ctx context.Context, materialID uuid.UUID, uoms []domain.MaterialUOM) error {
+	// 1. Validation: Must have exactly 1 default (Base Unit)
+	hasDefault := false
+	for _, uom := range uoms {
+		if uom.IsDefault {
+			if hasDefault {
+				return fmt.Errorf("multiple default UOMs provided")
+			}
+			hasDefault = true
+
+			// Base Unit multiplier must be 1
+			if uom.Multiplier != 1 {
+				return fmt.Errorf("base unit (default) multiplier must be 1")
+			}
+		}
+	}
+
+	if !hasDefault {
+		return fmt.Errorf("default UOM (Base Unit) must be provided")
+	}
+
+	// 2. Execute Replace (Transactional Sync)
+	if err := u.repo.ReplaceUOMs(ctx, materialID, uoms); err != nil {
+		config.Log.Error("failed to sync material UOMs",
+			zap.Error(err),
+			zap.String("material_id", materialID.String()),
+		)
+		return fmt.Errorf("material_uom_uc.UpdateUOMs: %w", err)
+	}
+
+	return nil
+}

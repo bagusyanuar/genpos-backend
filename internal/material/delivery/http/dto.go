@@ -109,3 +109,26 @@ func ToMaterialUOMListResponse(uoms []domain.MaterialUOM) []MaterialUOMResponse 
 	}
 	return res
 }
+
+type UpdateMaterialUOMRequest struct {
+	ID         *uuid.UUID `json:"id"`
+	UnitID     uuid.UUID  `json:"unit_id" validate:"required"`
+	Multiplier float64    `json:"multiplier" validate:"required,gt=0"`
+	IsDefault  bool       `json:"is_default"`
+}
+
+func (r *UpdateMaterialUOMRequest) ToEntity() domain.MaterialUOM {
+	uom := domain.MaterialUOM{
+		UnitID:     r.UnitID,
+		Multiplier: r.Multiplier,
+		IsDefault:  r.IsDefault,
+	}
+	if r.ID != nil {
+		uom.ID = *r.ID
+	}
+	return uom
+}
+
+type SyncMaterialUOMRequest struct {
+	UOMs []UpdateMaterialUOMRequest `json:"uoms" validate:"required,min=1"`
+}

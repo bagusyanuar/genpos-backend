@@ -37,3 +37,37 @@ func (r *materialUOMRepository) CreateBatch(ctx context.Context, uoms []domain.M
 	}
 	return nil
 }
+
+func (r *materialUOMRepository) ReplaceUOMs(ctx context.Context, materialID uuid.UUID, uoms []domain.MaterialUOM) error {
+	return r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		// 1. Collect incoming IDs to keep (Pre-allocate capacity)
+		incomingIDs := make([]uuid.UUID, 0, len(uoms))
+		for _, u := range uoms {
+			if u.ID != uuid.Nil {
+				incomingIDs = append(incomingIDs, u.ID)
+			}
+		}
+
+		// 2. Soft delete UOMs not in the incoming list
+		query := tx.Where("material_id = ?", materialID)
+		if len(incomingIDs) > 0 {
+			query = query.Where("id NOT IN ?", incomingIDs)
+		}
+		if err := query.Delete(&domain.MaterialUOM{}).Error; err != nil {
+			return fmt.Errorf("failed to delete removed UOMs: %w", err)
+		}
+
+		// 3. Prepare and Save (Upsert) incoming UOMs
+		for i := range uoms {
+			uoms[i].MaterialID = materialID
+		}
+
+		if len(uoms) > 0 {
+			if err := tx.Save(&uoms).Error; err != nil {
+				return fmt.Errorf("failed to save UOMs: %w", err)
+			}
+		}
+
+		return nil
+	})
+}
