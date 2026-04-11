@@ -10,9 +10,9 @@ import (
 
 func (c *Container) wireMaterialModule(db *gorm.DB, conf *config.Config) {
 	repo := materialRepo.NewMaterialRepository(db)
-	uc := materialUC.NewMaterialUsecase(repo)
-
 	uomRepo := materialRepo.NewMaterialUOMRepository(db)
+	
+	uc := materialUC.NewMaterialUsecase(repo, uomRepo)
 	uomUC := materialUC.NewMaterialUOMUsecase(uomRepo)
 
 	handler := materialHttp.NewMaterialHandler(uc, uomUC, conf)

@@ -29,3 +29,11 @@ func (r *materialUOMRepository) Find(ctx context.Context, materialID uuid.UUID) 
 
 	return uoms, nil
 }
+
+func (r *materialUOMRepository) CreateBatch(ctx context.Context, uoms []domain.MaterialUOM) error {
+	err := r.db.WithContext(ctx).Create(&uoms).Error
+	if err != nil {
+		return fmt.Errorf("material_uom_repo.CreateBatch: %w", err)
+	}
+	return nil
+}

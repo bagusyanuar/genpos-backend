@@ -10,12 +10,17 @@ import (
 )
 
 type Material struct {
-	ID        uuid.UUID      `gorm:"type:uuid;primaryKey" json:"id"`
-	SKU       string         `gorm:"type:varchar(50);not null" json:"sku"`
-	Name      string         `gorm:"type:varchar(255);not null" json:"name"`
-	CreatedAt time.Time      `json:"created_at"`
-	UpdatedAt time.Time      `json:"updated_at"`
-	DeletedAt gorm.DeletedAt `gorm:"index" json:"deleted_at,omitempty"`
+	ID           uuid.UUID      `gorm:"type:uuid;primaryKey" json:"id"`
+	CategoryID   *uuid.UUID     `gorm:"type:uuid" json:"category_id"`
+	SKU          string         `gorm:"type:varchar(50);not null" json:"sku"`
+	Name         string         `gorm:"type:varchar(255);not null" json:"name"`
+	Description  *string        `gorm:"type:text" json:"description"`
+	MaterialType string         `gorm:"type:varchar(50)" json:"material_type"`
+	ImageURL     *string        `gorm:"type:text" json:"image_url"`
+	IsActive     bool           `gorm:"not null;default:true" json:"is_active"`
+	CreatedAt    time.Time      `json:"created_at"`
+	UpdatedAt    time.Time      `json:"updated_at"`
+	DeletedAt    gorm.DeletedAt `gorm:"index" json:"deleted_at,omitempty"`
 }
 
 func (m *Material) BeforeCreate(tx *gorm.DB) (err error) {
@@ -33,11 +38,14 @@ type MaterialFilter struct {
 type MaterialRepository interface {
 	Find(ctx context.Context, filter MaterialFilter) ([]Material, int64, error)
 	FindByID(ctx context.Context, id uuid.UUID) (*Material, error)
+	Create(ctx context.Context, material *Material) error
+	GetDB() *gorm.DB
 }
 
 type MaterialUsecase interface {
 	Find(ctx context.Context, filter MaterialFilter) ([]Material, int64, error)
 	FindByID(ctx context.Context, id uuid.UUID) (*Material, error)
+	Create(ctx context.Context, material *Material, uoms []MaterialUOM) error
 }
 
 type MaterialUOM struct {
@@ -52,6 +60,7 @@ type MaterialUOM struct {
 
 type MaterialUOMRepository interface {
 	Find(ctx context.Context, materialID uuid.UUID) ([]MaterialUOM, error)
+	CreateBatch(ctx context.Context, uoms []MaterialUOM) error
 }
 
 type MaterialUOMUsecase interface {

@@ -50,3 +50,12 @@ func ErrorWithDetails(message string, errors any) APIResponse[any] {
 		Errors:  errors,
 	}
 }
+
+// ValidationError returns a standard 422 Unprocessable Entity error response
+func ValidationError(errors any) APIResponse[any] {
+	return APIResponse[any]{
+		Success: false,
+		Message: "Validation failed",
+		Errors:  errors,
+	}
+}

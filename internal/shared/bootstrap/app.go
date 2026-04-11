@@ -32,6 +32,9 @@ func Start(conf *config.Config, deps *container.Container) {
 	app.Use(middleware.Logger(conf)) // 2. Log using custom Zap middleware
 	app.Use(recover.New())     // 3. Panic recovery
 
+	// Static files
+	app.Static("/public", "./public")
+
 	// Register Routes
 	api := app.Group("/api/v1")
 
@@ -45,6 +48,7 @@ func Start(conf *config.Config, deps *container.Container) {
 	deps.CategoryHandler.Register(api, jwtMiddleware)
 	deps.MaterialHandler.Register(api, jwtMiddleware)
 	deps.InventoryHandler.Register(api, jwtMiddleware)
+	deps.MediaHandler.Register(api, jwtMiddleware)
 
 	// Start Server
 	config.Log.Info("Server is starting...", zap.String("port", conf.AppPort))

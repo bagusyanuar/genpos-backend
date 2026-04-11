@@ -5,6 +5,7 @@ import (
 	"github.com/bagusyanuar/genpos-backend/internal/shared/config"
 	"github.com/bagusyanuar/genpos-backend/pkg/request"
 	"github.com/bagusyanuar/genpos-backend/pkg/response"
+	"github.com/bagusyanuar/genpos-backend/pkg/validator"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"go.uber.org/zap"
@@ -31,6 +32,33 @@ func (h *MaterialHandler) Register(router fiber.Router, authMiddleware fiber.Han
 	group.Get("/", h.Find)
 	group.Get("/:id", h.FindByID)
 	group.Get("/:id/uoms", h.FindUOMs)
+	group.Post("/", h.Create)
+}
+
+func (h *MaterialHandler) Create(c *fiber.Ctx) error {
+	var req CreateMaterialRequest
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(response.Error("invalid request body"))
+	}
+
+	// Validation
+	if errs := validator.Validate(req); errs != nil {
+		return c.Status(fiber.StatusUnprocessableEntity).JSON(response.ValidationError(errs))
+	}
+
+	material := req.ToEntity()
+	uoms := make([]domain.MaterialUOM, 0)
+	for _, u := range req.UOMs {
+		uoms = append(uoms, u.ToEntity())
+	}
+
+	if err := h.uc.Create(c.Context(), material, uoms); err != nil {
+		config.Log.Error("handler.Create material error", zap.Error(err))
+		return c.Status(fiber.StatusInternalServerError).JSON(response.Error(err.Error()))
+	}
+
+	res := ToMaterialResponse(*material)
+	return c.Status(fiber.StatusCreated).JSON(response.Success(res, "material created successfully"))
 }
 
 func (h *MaterialHandler) FindByID(c *fiber.Ctx) error {

@@ -8,20 +8,67 @@ import (
 )
 
 type MaterialResponse struct {
-	ID        uuid.UUID `json:"id"`
-	SKU       string    `json:"sku"`
-	Name      string    `json:"name"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	ID           uuid.UUID `json:"id"`
+	CategoryID   *uuid.UUID `json:"category_id"`
+	SKU          string    `json:"sku"`
+	Name         string    `json:"name"`
+	Description  *string   `json:"description"`
+	MaterialType string    `json:"material_type"`
+	ImageURL     *string   `json:"image_url"`
+	IsActive     bool      `json:"is_active"`
+	CreatedAt    time.Time `json:"created_at"`
+	UpdatedAt    time.Time `json:"updated_at"`
+}
+
+type CreateMaterialUOMRequest struct {
+	UnitID     uuid.UUID `json:"unit_id" validate:"required"`
+	Multiplier float64   `json:"multiplier" validate:"required,gt=0"`
+	IsDefault  bool      `json:"is_default"`
+}
+
+type CreateMaterialRequest struct {
+	CategoryID   *uuid.UUID                 `json:"category_id"`
+	SKU          string                     `json:"sku" validate:"required"`
+	Name         string                     `json:"name" validate:"required"`
+	Description  *string                    `json:"description"`
+	MaterialType string                     `json:"material_type" validate:"required"`
+	ImageURL     *string                    `json:"image_url"`
+	IsActive     bool                       `json:"is_active" validate:"required"`
+	UOMs         []CreateMaterialUOMRequest `json:"uoms" validate:"required,min=1"`
+}
+
+func (r *CreateMaterialRequest) ToEntity() *domain.Material {
+	return &domain.Material{
+		CategoryID:   r.CategoryID,
+		SKU:          r.SKU,
+		Name:         r.Name,
+		Description:  r.Description,
+		MaterialType: r.MaterialType,
+		ImageURL:     r.ImageURL,
+		IsActive:     r.IsActive,
+	}
+}
+
+func (r *CreateMaterialUOMRequest) ToEntity() domain.MaterialUOM {
+	return domain.MaterialUOM{
+		UnitID:     r.UnitID,
+		Multiplier: r.Multiplier,
+		IsDefault:  r.IsDefault,
+	}
 }
 
 func ToMaterialResponse(m domain.Material) MaterialResponse {
 	return MaterialResponse{
-		ID:        m.ID,
-		SKU:       m.SKU,
-		Name:      m.Name,
-		CreatedAt: m.CreatedAt,
-		UpdatedAt: m.UpdatedAt,
+		ID:           m.ID,
+		CategoryID:   m.CategoryID,
+		SKU:          m.SKU,
+		Name:         m.Name,
+		Description:  m.Description,
+		MaterialType: m.MaterialType,
+		ImageURL:     m.ImageURL,
+		IsActive:     m.IsActive,
+		CreatedAt:    m.CreatedAt,
+		UpdatedAt:    m.UpdatedAt,
 	}
 }
 

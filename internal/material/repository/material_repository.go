@@ -18,6 +18,18 @@ func NewMaterialRepository(db *gorm.DB) domain.MaterialRepository {
 	return &materialRepository{db: db}
 }
 
+func (r *materialRepository) GetDB() *gorm.DB {
+	return r.db
+}
+
+func (r *materialRepository) Create(ctx context.Context, material *domain.Material) error {
+	err := r.db.WithContext(ctx).Create(material).Error
+	if err != nil {
+		return fmt.Errorf("material_repo.Create: %w", err)
+	}
+	return nil
+}
+
 func (r *materialRepository) FindByID(ctx context.Context, id uuid.UUID) (*domain.Material, error) {
 	var material domain.Material
 	err := r.db.WithContext(ctx).First(&material, "id = ?", id).Error
