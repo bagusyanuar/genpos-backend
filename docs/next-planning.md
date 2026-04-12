@@ -1,39 +1,25 @@
-# 🚀 GenPOS — Next Implementation Planning
+# Roadmap & Next Planning
 
-Dokumen ini mencatat rencana pengembangan fitur setelah implementasi Atomic Create Material dan Shared Upload System.
+## ✅ Phase 1: Material Lifecycle (Done)
+- [x] Basic CRUD Material
+- [x] Multi-UOM & Conversion
+- [x] Image Management
+- [x] History: [material.md](history/material.md)
 
-## 📋 Roadmaps
-Progress yang sudah selesai dipindahkan ke [docs/history/](file:///d:/project-go/genpos-backend/docs/history/) untuk menjaga kebersihan roadmap.
+## ✅ Phase 2: Product & Menu (Done)
+- [x] Product & Variant Mapping
+- [x] Multi-Branch Availability
+- [x] Stepper Creation & Image Patch
+- [x] Optimized Variant Sync (Upsert)
+- [x] History: [product.md](history/product.md)
 
-## 🍔 Phase 2: Product & Menu Module
-Manajemen item yang akan dijual ke pelanggan.
+## 🚀 Phase 3: Recipe & BOM (Current)
+- [ ] Database Schema: `recipes` (Link Product Variant to Materials).
+- [ ] Recipe Logic: Define quantity needed in **Base Unit**.
+- [ ] Inventory Integration: Automated stock deduction proposal.
+- [ ] Bulk Recipe Management.
 
-- [ ] **Product Metadata**: 
-    - Nama, kategori produk, deskripsi, image.
-- [ ] **Variant Support**: 
-    - Implementasi tabel `product_variants`.
-    - Tiap produk minimal 1 varian (Default/Regular).
-    - Support harga berbeda per varian (misal: S/M/L).
-- [ ] **Branch Mapping**: 
-    - Implementasi Many-to-Many via `branch_products`.
-    - Filter ketersediaan menu per cabang.
-
-## 🧪 Phase 3: Recipe & Production (BOM)
-Menghubungkan Material (Bahan Baku) dengan Menu Penjualan.
-
-- [ ] **Recipe Management**:
-    - Definisi komposisi per **Varian Produk** (Contoh: 1 Cup Kopi Ice = 18gr Biji Kopi + 150ml Air).
-    - Support untuk *Sub-Recipe* (Bahan olahan/Semi-finished).
-- [ ] **Auto-Deduction Engine**: Integrasi dengan modul Transaksi untuk memotong stok otomatis saat produk terjual.
-
-## 📉 Phase 4: Inventory Advanced
-Fitur lanjutan untuk akurasi stok.
-
-- [ ] **Stock Adjustment**: Input manual untuk stok masuk (PO) atau stok rusak/hilang.
-- [ ] **Stock Opname**: Fitur verifikasi stok fisik vs sistem secara berkala.
-- [ ] **Low Stock Alert**: Notifikasi jika bahan baku mencapai ambang batas minimum.
-
----
-
-> [!NOTE]
-> Seluruh implementasi harus tetap mengikuti **Clean Architecture** dan menggunakan `pkg/fileupload` untuk setiap aset gambar yang diunggah.
+## 🔜 Phase 4: Inventory & Stock Movement
+- [ ] Stock In / Stock Out (Manual).
+- [ ] Stock Opname per Branch.
+- [ ] Movement History & Audit Log.
