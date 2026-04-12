@@ -12,7 +12,7 @@ func (c *Container) wireMaterialModule(db *gorm.DB, conf *config.Config) {
 	repo := materialRepo.NewMaterialRepository(db)
 	uomRepo := materialRepo.NewMaterialUOMRepository(db)
 	
-	uc := materialUC.NewMaterialUsecase(repo, uomRepo)
+	uc := materialUC.NewMaterialUsecase(repo, uomRepo, c.Uploader)
 	uomUC := materialUC.NewMaterialUOMUsecase(uomRepo)
 
 	handler := materialHttp.NewMaterialHandler(uc, uomUC, conf)

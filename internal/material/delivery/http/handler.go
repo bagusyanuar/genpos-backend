@@ -33,6 +33,9 @@ func (h *MaterialHandler) Register(router fiber.Router, authMiddleware fiber.Han
 	group.Get("/:id", h.FindByID)
 	group.Get("/:id/uoms", h.FindUOMs)
 	group.Post("/", h.Create)
+	group.Put("/:id", h.Update)
+	group.Patch("/:id/image", h.PatchImage)
+	group.Delete("/:id", h.Delete)
 	group.Put("/:id/uoms", h.SyncUOMs)
 }
 
@@ -158,4 +161,68 @@ func (h *MaterialHandler) SyncUOMs(c *fiber.Ctx) error {
 	}
 
 	return c.Status(fiber.StatusOK).JSON(response.Success[any](nil, "material UOMs synced successfully"))
+}
+func (h *MaterialHandler) Update(c *fiber.Ctx) error {
+	idStr := c.Params("id")
+	id, err := uuid.Parse(idStr)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(response.Error("invalid material id format"))
+	}
+
+	var req UpdateMaterialRequest
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(response.Error("invalid request body"))
+	}
+
+	if errs := validator.Validate(req); errs != nil {
+		return c.Status(fiber.StatusUnprocessableEntity).JSON(response.ValidationError(errs))
+	}
+
+	material := req.ToEntity(id)
+	if err := h.uc.Update(c.Context(), material); err != nil {
+		config.Log.Error("handler.Update material error", zap.Error(err), zap.String("id", idStr))
+		return c.Status(fiber.StatusInternalServerError).JSON(response.Error(err.Error()))
+	}
+
+	res := ToMaterialResponse(*material)
+	return c.Status(fiber.StatusOK).JSON(response.Success(res, "material updated successfully"))
+}
+
+func (h *MaterialHandler) PatchImage(c *fiber.Ctx) error {
+	idStr := c.Params("id")
+	id, err := uuid.Parse(idStr)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(response.Error("invalid material id format"))
+	}
+
+	var req PatchMaterialImageRequest
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(response.Error("invalid request body"))
+	}
+
+	if errs := validator.Validate(req); errs != nil {
+		return c.Status(fiber.StatusUnprocessableEntity).JSON(response.ValidationError(errs))
+	}
+
+	if err := h.uc.UpdateImage(c.Context(), id, req.ImageURL); err != nil {
+		config.Log.Error("handler.PatchImage material error", zap.Error(err), zap.String("id", idStr))
+		return c.Status(fiber.StatusInternalServerError).JSON(response.Error(err.Error()))
+	}
+
+	return c.Status(fiber.StatusOK).JSON(response.Success[any](nil, "material image updated successfully"))
+}
+
+func (h *MaterialHandler) Delete(c *fiber.Ctx) error {
+	idStr := c.Params("id")
+	id, err := uuid.Parse(idStr)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(response.Error("invalid material id format"))
+	}
+
+	if err := h.uc.Delete(c.Context(), id); err != nil {
+		config.Log.Error("handler.Delete material error", zap.Error(err), zap.String("id", idStr))
+		return c.Status(fiber.StatusInternalServerError).JSON(response.Error(err.Error()))
+	}
+
+	return c.Status(fiber.StatusOK).JSON(response.Success[any](nil, "material deleted successfully"))
 }

@@ -6,6 +6,7 @@ import (
 
 	"github.com/bagusyanuar/genpos-backend/internal/material/domain"
 	"github.com/bagusyanuar/genpos-backend/internal/shared/config"
+	"github.com/bagusyanuar/genpos-backend/pkg/fileupload"
 	"github.com/google/uuid"
 	"go.uber.org/zap"
 )
@@ -13,12 +14,18 @@ import (
 type materialUsecase struct {
 	materialRepo domain.MaterialRepository
 	uomRepo      domain.MaterialUOMRepository
+	uploader     fileupload.FileUploader
 }
 
-func NewMaterialUsecase(materialRepo domain.MaterialRepository, uomRepo domain.MaterialUOMRepository) domain.MaterialUsecase {
+func NewMaterialUsecase(
+	materialRepo domain.MaterialRepository,
+	uomRepo domain.MaterialUOMRepository,
+	uploader fileupload.FileUploader,
+) domain.MaterialUsecase {
 	return &materialUsecase{
 		materialRepo: materialRepo,
 		uomRepo:      uomRepo,
+		uploader:     uploader,
 	}
 }
 
@@ -76,6 +83,67 @@ func (u *materialUsecase) Create(ctx context.Context, material *domain.Material,
 	return nil
 }
 
+func (u *materialUsecase) Update(ctx context.Context, material *domain.Material) error {
+	// 1. Validation for MaterialType
+	if material.MaterialType != "" && material.MaterialType != "RAW" && material.MaterialType != "SEMI_FINISHED" {
+		return fmt.Errorf("invalid material type: %s", material.MaterialType)
+	}
+
+	// 2. Find existing material to handle image cleanup
+	existing, err := u.materialRepo.FindByID(ctx, material.ID)
+	if err != nil {
+		return fmt.Errorf("material_uc.Update.FindByID: %w", err)
+	}
+
+	// 3. Update Material
+	if err := u.materialRepo.Update(ctx, material); err != nil {
+		return fmt.Errorf("material_uc.Update.Repo: %w", err)
+	}
+
+	// 4. Image Cleanup: Delete old image ONLY if DB update succeeded and URL changed
+	if material.ImageURL != nil && existing.ImageURL != nil && *material.ImageURL != *existing.ImageURL {
+		if err := u.uploader.Delete(*existing.ImageURL); err != nil {
+			config.Log.Warn("failed to delete old image after successful update", 
+				zap.Error(err), 
+				zap.String("url", *existing.ImageURL),
+			)
+		}
+	}
+
+	return nil
+}
+
+func (u *materialUsecase) UpdateImage(ctx context.Context, id uuid.UUID, imageURL string) error {
+	// 1. Find existing material
+	existing, err := u.materialRepo.FindByID(ctx, id)
+	if err != nil {
+		return fmt.Errorf("material_uc.UpdateImage.FindByID: %w", err)
+	}
+
+	// 2. Update Image URL in DB first
+	oldURL := ""
+	if existing.ImageURL != nil {
+		oldURL = *existing.ImageURL
+	}
+
+	existing.ImageURL = &imageURL
+	if err := u.materialRepo.Update(ctx, existing); err != nil {
+		return fmt.Errorf("material_uc.UpdateImage.Repo: %w", err)
+	}
+
+	// 3. Delete old image ONLY if DB update succeeded
+	if oldURL != "" && oldURL != imageURL {
+		if err := u.uploader.Delete(oldURL); err != nil {
+			config.Log.Warn("failed to delete old image after successful patch", 
+				zap.Error(err), 
+				zap.String("url", oldURL),
+			)
+		}
+	}
+
+	return nil
+}
+
 func (u *materialUsecase) FindByID(ctx context.Context, id uuid.UUID) (*domain.Material, error) {
 	material, err := u.materialRepo.FindByID(ctx, id)
 	if err != nil {
@@ -99,4 +167,15 @@ func (u *materialUsecase) Find(ctx context.Context, filter domain.MaterialFilter
 	}
 
 	return materials, total, nil
+}
+
+func (u *materialUsecase) Delete(ctx context.Context, id uuid.UUID) error {
+	if err := u.materialRepo.Delete(ctx, id); err != nil {
+		config.Log.Error("failed to delete material",
+			zap.Error(err),
+			zap.String("id", id.String()),
+		)
+		return fmt.Errorf("material_uc.Delete: %w", err)
+	}
+	return nil
 }

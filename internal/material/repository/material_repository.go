@@ -30,6 +30,19 @@ func (r *materialRepository) Create(ctx context.Context, material *domain.Materi
 	return nil
 }
 
+func (r *materialRepository) Update(ctx context.Context, material *domain.Material) error {
+	// Optimization: Use Select to specify columns to update. 
+	// This prevents overwriting created_at or other fields not intended for update.
+	err := r.db.WithContext(ctx).Model(material).
+		Select("category_id", "sku", "name", "description", "material_type", "image_url", "is_active", "updated_at").
+		Updates(material).Error
+
+	if err != nil {
+		return fmt.Errorf("material_repo.Update: %w", err)
+	}
+	return nil
+}
+
 func (r *materialRepository) FindByID(ctx context.Context, id uuid.UUID) (*domain.Material, error) {
 	var material domain.Material
 	err := r.db.WithContext(ctx).First(&material, "id = ?", id).Error
@@ -37,6 +50,14 @@ func (r *materialRepository) FindByID(ctx context.Context, id uuid.UUID) (*domai
 		return nil, fmt.Errorf("material_repo.FindByID: %w", err)
 	}
 	return &material, nil
+}
+
+func (r *materialRepository) Delete(ctx context.Context, id uuid.UUID) error {
+	err := r.db.WithContext(ctx).Delete(&domain.Material{}, "id = ?", id).Error
+	if err != nil {
+		return fmt.Errorf("material_repo.Delete: %w", err)
+	}
+	return nil
 }
 
 func (r *materialRepository) Find(ctx context.Context, filter domain.MaterialFilter) ([]domain.Material, int64, error) {

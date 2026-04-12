@@ -16,6 +16,7 @@ import (
 	inventoryHttp "github.com/bagusyanuar/genpos-backend/internal/inventory/delivery/http"
 	inventoryDomain "github.com/bagusyanuar/genpos-backend/internal/inventory/domain"
 	mediaHttp "github.com/bagusyanuar/genpos-backend/internal/media/delivery/http"
+	"github.com/bagusyanuar/genpos-backend/pkg/fileupload"
 	"gorm.io/gorm"
 )
 
@@ -34,10 +35,14 @@ type Container struct {
 	InventoryUC      inventoryDomain.InventoryUsecase
 	InventoryHandler *inventoryHttp.InventoryHandler
 	MediaHandler     *mediaHttp.MediaHandler
+	Uploader          fileupload.FileUploader
 }
 
 func NewContainer(db *gorm.DB, conf *config.Config) *Container {
 	c := &Container{}
+
+	// Initialize shared components
+	c.Uploader = fileupload.NewLocalFileUploader("./public/uploads", "/public/uploads")
 
 	// Wiring modules (delegated to modular files)
 	userRepo := c.wireUserModule(db, conf)
@@ -47,7 +52,7 @@ func NewContainer(db *gorm.DB, conf *config.Config) *Container {
 	c.wireCategoryModule(db, conf)
 	c.wireMaterialModule(db, conf)
 	c.wireInventoryModule(db, conf)
-	c.wireMediaModule(db, conf)
+	c.wireMediaModule(conf)
 
 	return c
 }

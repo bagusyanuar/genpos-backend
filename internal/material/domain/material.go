@@ -39,6 +39,8 @@ type MaterialRepository interface {
 	Find(ctx context.Context, filter MaterialFilter) ([]Material, int64, error)
 	FindByID(ctx context.Context, id uuid.UUID) (*Material, error)
 	Create(ctx context.Context, material *Material) error
+	Update(ctx context.Context, material *Material) error
+	Delete(ctx context.Context, id uuid.UUID) error
 	GetDB() *gorm.DB
 }
 
@@ -46,6 +48,9 @@ type MaterialUsecase interface {
 	Find(ctx context.Context, filter MaterialFilter) ([]Material, int64, error)
 	FindByID(ctx context.Context, id uuid.UUID) (*Material, error)
 	Create(ctx context.Context, material *Material, uoms []MaterialUOM) error
+	Update(ctx context.Context, material *Material) error
+	UpdateImage(ctx context.Context, id uuid.UUID, imageURL string) error
+	Delete(ctx context.Context, id uuid.UUID) error
 }
 
 type MaterialUOM struct {

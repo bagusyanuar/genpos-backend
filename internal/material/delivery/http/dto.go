@@ -132,3 +132,30 @@ func (r *UpdateMaterialUOMRequest) ToEntity() domain.MaterialUOM {
 type SyncMaterialUOMRequest struct {
 	UOMs []UpdateMaterialUOMRequest `json:"uoms" validate:"required,min=1"`
 }
+
+type UpdateMaterialRequest struct {
+	CategoryID   *uuid.UUID `json:"category_id"`
+	SKU          string     `json:"sku" validate:"required"`
+	Name         string     `json:"name" validate:"required"`
+	Description  *string    `json:"description"`
+	MaterialType string     `json:"material_type" validate:"required"`
+	ImageURL     *string    `json:"image_url"`
+	IsActive     bool       `json:"is_active" validate:"required"`
+}
+
+func (r *UpdateMaterialRequest) ToEntity(id uuid.UUID) *domain.Material {
+	return &domain.Material{
+		ID:           id,
+		CategoryID:   r.CategoryID,
+		SKU:          r.SKU,
+		Name:         r.Name,
+		Description:  r.Description,
+		MaterialType: r.MaterialType,
+		ImageURL:     r.ImageURL,
+		IsActive:     r.IsActive,
+	}
+}
+
+type PatchMaterialImageRequest struct {
+	ImageURL string `json:"image_url" validate:"required"`
+}
