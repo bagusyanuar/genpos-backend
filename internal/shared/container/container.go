@@ -15,6 +15,8 @@ import (
 	materialDomain "github.com/bagusyanuar/genpos-backend/internal/material/domain"
 	inventoryHttp "github.com/bagusyanuar/genpos-backend/internal/inventory/delivery/http"
 	inventoryDomain "github.com/bagusyanuar/genpos-backend/internal/inventory/domain"
+	productHttp "github.com/bagusyanuar/genpos-backend/internal/product/delivery/http"
+	productDomain "github.com/bagusyanuar/genpos-backend/internal/product/domain"
 	mediaHttp "github.com/bagusyanuar/genpos-backend/internal/media/delivery/http"
 	"github.com/bagusyanuar/genpos-backend/pkg/fileupload"
 	"gorm.io/gorm"
@@ -34,6 +36,8 @@ type Container struct {
 	MaterialHandler *materialHttp.MaterialHandler
 	InventoryUC      inventoryDomain.InventoryUsecase
 	InventoryHandler *inventoryHttp.InventoryHandler
+	ProductHandler   *productHttp.ProductHandler
+	ProductUC        productDomain.ProductUsecase
 	MediaHandler     *mediaHttp.MediaHandler
 	Uploader          fileupload.FileUploader
 }
@@ -52,6 +56,7 @@ func NewContainer(db *gorm.DB, conf *config.Config) *Container {
 	c.wireCategoryModule(db, conf)
 	c.wireMaterialModule(db, conf)
 	c.wireInventoryModule(db, conf)
+	c.wireProductModule(db, conf)
 	c.wireMediaModule(conf)
 
 	return c

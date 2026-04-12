@@ -1,0 +1,19 @@
+Table products {
+  id uuid [pk]
+  category_id uuid [ref: > categories.id]
+  name varchar(255) [not null]
+  description text
+  image_url text
+  is_active boolean [not null, default: true]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+  deleted_at timestamp
+
+  indexes {
+    category_id
+    is_active
+    deleted_at
+  }
+
+  Note: "Master data produk jualan"
+}

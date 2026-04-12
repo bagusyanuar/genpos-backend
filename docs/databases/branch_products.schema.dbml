@@ -1,0 +1,15 @@
+Table branch_products {
+  branch_id uuid [ref: > branches.id]
+  product_id uuid [ref: > products.id]
+  is_active boolean [not null, default: true]
+  created_at timestamp [default: `now()`]
+  updated_at timestamp [default: `now()`]
+
+  indexes {
+    (branch_id, product_id) [pk]
+    branch_id
+    product_id
+  }
+
+  Note: "Relasi ketersediaan produk di tiap cabang (Many-to-Many)"
+}

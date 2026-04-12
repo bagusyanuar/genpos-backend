@@ -48,6 +48,7 @@ func Start(conf *config.Config, deps *container.Container) {
 	deps.CategoryHandler.Register(api, jwtMiddleware)
 	deps.MaterialHandler.Register(api, jwtMiddleware)
 	deps.InventoryHandler.Register(api, jwtMiddleware)
+	deps.ProductHandler.Register(api, jwtMiddleware)
 	deps.MediaHandler.Register(api, jwtMiddleware)
 
 	// Start Server
