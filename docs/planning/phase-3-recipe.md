@@ -10,6 +10,13 @@ Connect **Materials** (Raw Ingredients) to **Product Variants** (Sellable Items)
 - **Inventory Integration**:
     - Deduction should happen during Sales (Future Phase) or Production (Manual).
     - Support for "Waste" factor (optional but good for senior level).
+- **Live COGS Estimation**:
+    - The API must dynamically calculate Estimated COGS based on `(Recipe Qty in Base Unit * Material base_cost) + Variant overhead_cost`.
+    - This provides realtime Gross Margin feedback to the manager without affecting historical transaction COGS.
+- **Data Integrity (Crucial)**:
+    - **Restricted Delete**: Materials and UOMs CANNOT be deleted if they are used in active recipes.
+    - **Cascaded Delete**: If a Product Variant is soft-deleted, all associated Recipes must also be soft-deleted automatically.
+    - **Ubiquitous Language**: Quantities in recipes are entered in a specific `UOM` but must be logically convertible to the Material's `Base Unit`.
 
 ## Database Schema Proposal
 ### `recipes`
@@ -21,7 +28,8 @@ Connect **Materials** (Raw Ingredients) to **Product Variants** (Sellable Items)
 - `created_at`, `updated_at`
 
 ## Implementation Steps
-1. **Migration**: Create `recipes` table.
-2. **Domain**: Define `Recipe` entity and interfaces.
-3. **Usecase**: Logic to validate UOM conversion and prevent recursive recipes.
-4. **API**: `GET/POST/PUT/DELETE` for managing recipe of a variant.
+- [x] **Schema Adjustment**: Add `base_cost` to materials and `overhead_cost` to variants. Setup `recipes` schema.
+- [ ] **Domain**: Define `Recipe` entity and interfaces in `internal/recipe/domain`.
+- [ ] **Repository**: Implement DB operations for Recipes.
+- [ ] **Usecase**: Logic to validate UOM conversion, calculate Live COGS, and prevent recursive recipes.
+- [ ] **API**: `GET/POST/PUT/DELETE` for managing recipe of a variant.

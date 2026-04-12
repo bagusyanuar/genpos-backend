@@ -10,9 +10,10 @@ import (
 type CreateProductVariantRequest struct {
 	ID       *uuid.UUID `json:"id"`
 	Name     string     `json:"name" validate:"required"`
-	SKU      string     `json:"sku" validate:"required"`
-	Price    float64    `json:"price" validate:"required,gte=0"`
-	IsActive bool       `json:"is_active" validate:"required"`
+	SKU          string     `json:"sku" validate:"required"`
+	Price        float64    `json:"price" validate:"required,gte=0"`
+	OverheadCost float64    `json:"overhead_cost"`
+	IsActive     bool       `json:"is_active" validate:"required"`
 }
 
 type CreateProductRequest struct {
@@ -35,10 +36,11 @@ func (r *CreateProductRequest) ToEntity() *domain.Product {
 
 func (r *CreateProductVariantRequest) ToEntity() domain.ProductVariant {
 	variant := domain.ProductVariant{
-		Name:     r.Name,
-		SKU:      r.SKU,
-		Price:    r.Price,
-		IsActive: r.IsActive,
+		Name:         r.Name,
+		SKU:          r.SKU,
+		Price:        r.Price,
+		OverheadCost: r.OverheadCost,
+		IsActive:     r.IsActive,
 	}
 
 	if r.ID != nil {
@@ -49,11 +51,12 @@ func (r *CreateProductVariantRequest) ToEntity() domain.ProductVariant {
 }
 
 type ProductVariantResponse struct {
-	ID        uuid.UUID `json:"id"`
-	Name      string    `json:"name"`
-	SKU       string    `json:"sku"`
-	Price     float64   `json:"price"`
-	IsActive  bool      `json:"is_active"`
+	ID           uuid.UUID `json:"id"`
+	Name         string    `json:"name"`
+	SKU          string    `json:"sku"`
+	Price        float64   `json:"price"`
+	OverheadCost float64   `json:"overhead_cost"`
+	IsActive     bool      `json:"is_active"`
 }
 
 type ProductResponse struct {
@@ -72,11 +75,12 @@ func ToProductResponse(p domain.Product) ProductResponse {
 	variants := make([]ProductVariantResponse, 0)
 	for _, v := range p.Variants {
 		variants = append(variants, ProductVariantResponse{
-			ID:       v.ID,
-			Name:     v.Name,
-			SKU:      v.SKU,
-			Price:    v.Price,
-			IsActive: v.IsActive,
+			ID:           v.ID,
+			Name:         v.Name,
+			SKU:          v.SKU,
+			Price:        v.Price,
+			OverheadCost: v.OverheadCost,
+			IsActive:     v.IsActive,
 		})
 	}
 

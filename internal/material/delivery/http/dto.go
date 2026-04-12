@@ -15,6 +15,7 @@ type MaterialResponse struct {
 	Description  *string   `json:"description"`
 	MaterialType string    `json:"material_type"`
 	ImageURL     *string   `json:"image_url"`
+	BaseCost     float64   `json:"base_cost"`
 	IsActive     bool      `json:"is_active"`
 	CreatedAt    time.Time `json:"created_at"`
 	UpdatedAt    time.Time `json:"updated_at"`
@@ -33,6 +34,7 @@ type CreateMaterialRequest struct {
 	Description  *string                    `json:"description"`
 	MaterialType string                     `json:"material_type" validate:"required"`
 	ImageURL     *string                    `json:"image_url"`
+	BaseCost     float64                    `json:"base_cost"`
 	IsActive     bool                       `json:"is_active" validate:"required"`
 	UOMs         []CreateMaterialUOMRequest `json:"uoms" validate:"required,min=1"`
 }
@@ -45,6 +47,7 @@ func (r *CreateMaterialRequest) ToEntity() *domain.Material {
 		Description:  r.Description,
 		MaterialType: r.MaterialType,
 		ImageURL:     r.ImageURL,
+		BaseCost:     r.BaseCost,
 		IsActive:     r.IsActive,
 	}
 }
@@ -66,6 +69,7 @@ func ToMaterialResponse(m domain.Material) MaterialResponse {
 		Description:  m.Description,
 		MaterialType: m.MaterialType,
 		ImageURL:     m.ImageURL,
+		BaseCost:     m.BaseCost,
 		IsActive:     m.IsActive,
 		CreatedAt:    m.CreatedAt,
 		UpdatedAt:    m.UpdatedAt,
@@ -140,6 +144,7 @@ type UpdateMaterialRequest struct {
 	Description  *string    `json:"description"`
 	MaterialType string     `json:"material_type" validate:"required"`
 	ImageURL     *string    `json:"image_url"`
+	BaseCost     float64    `json:"base_cost"`
 	IsActive     bool       `json:"is_active" validate:"required"`
 }
 
@@ -152,6 +157,7 @@ func (r *UpdateMaterialRequest) ToEntity(id uuid.UUID) *domain.Material {
 		Description:  r.Description,
 		MaterialType: r.MaterialType,
 		ImageURL:     r.ImageURL,
+		BaseCost:     r.BaseCost,
 		IsActive:     r.IsActive,
 	}
 }

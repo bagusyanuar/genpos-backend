@@ -4,6 +4,7 @@ Table product_variants {
   name varchar(100) [not null, note: "Example: Small, Large, Hot, Ice"]
   sku varchar(100) [not null, unique]
   price decimal(15,2) [not null, default: 0]
+  overhead_cost decimal(15,2) [not null, default: 0, note: "Fixed overhead cost for packaging, waste, etc."]
   is_active boolean [not null, default: true]
   created_at timestamp [default: `now()`]
   updated_at timestamp [default: `now()`]

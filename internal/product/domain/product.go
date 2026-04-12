@@ -35,9 +35,10 @@ type ProductVariant struct {
 	ID        uuid.UUID      `gorm:"type:uuid;primaryKey" json:"id"`
 	ProductID uuid.UUID      `gorm:"type:uuid;not null;index" json:"product_id"`
 	Name      string         `gorm:"type:varchar(100);not null" json:"name"`
-	SKU       string         `gorm:"type:varchar(100);not null;index" json:"sku"`
-	Price     float64        `gorm:"type:decimal(15,2);not null;default:0" json:"price"`
-	IsActive  bool           `gorm:"not null;default:true" json:"is_active"`
+	SKU          string         `gorm:"type:varchar(100);not null;index" json:"sku"`
+	Price        float64        `gorm:"type:decimal(15,2);not null;default:0" json:"price"`
+	OverheadCost float64        `gorm:"type:decimal(15,2);not null;default:0" json:"overhead_cost"`
+	IsActive     bool           `gorm:"not null;default:true" json:"is_active"`
 	CreatedAt time.Time      `json:"created_at"`
 	UpdatedAt time.Time      `json:"updated_at"`
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"deleted_at,omitempty"`
