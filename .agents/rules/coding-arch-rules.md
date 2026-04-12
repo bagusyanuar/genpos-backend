@@ -8,6 +8,7 @@ trigger: pattern: .*\.go$
 - **Errors**: Wrap with `fmt.Errorf("context: %w", err)`.
 - **DTO**: Strict separation (Domain vs Req/Res).
 - **Optimization**: Always use `make([]T, 0, cap)` for slices. Use non-destructive Upsert for relational data.
+- **Middle Ground Calculation**: For logic involving both systemic calculation and manual overrides (e.g., COGS), always prioritize manual input if provided (> 0). Fallback to dynamic systemic logic only if override is missing/zero.
 
 ## 📂 Directory Rules
 

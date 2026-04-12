@@ -50,3 +50,12 @@ func (r *productVariantRepository) FindByProductID(ctx context.Context, productI
 	}
 	return variants, nil
 }
+
+func (r *productVariantRepository) FindByID(ctx context.Context, id uuid.UUID) (*domain.ProductVariant, error) {
+	var variant domain.ProductVariant
+	err := r.db.WithContext(ctx).First(&variant, "id = ?", id).Error
+	if err != nil {
+		return nil, fmt.Errorf("variant_repo.FindByID: %w", err)
+	}
+	return &variant, nil
+}

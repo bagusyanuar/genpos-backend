@@ -81,6 +81,7 @@ type ProductVariantRepository interface {
 	UpdateBatch(ctx context.Context, variants []ProductVariant) error
 	DeleteByProductID(ctx context.Context, productID uuid.UUID) error
 	FindByProductID(ctx context.Context, productID uuid.UUID) ([]ProductVariant, error)
+	FindByID(ctx context.Context, id uuid.UUID) (*ProductVariant, error)
 }
 
 type BranchProductRepository interface {

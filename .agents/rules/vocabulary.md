@@ -19,6 +19,10 @@ Always strictly adhere to these definitions when discussing features, writing co
 
 ## 🍳 Production & Recipes
 *   **Recipe / BOM (Bill of Materials)**: The exact formula of Materials needed to produce 1 Product Variant. When a Variant is sold, the inventory is deducted based on this Recipe using the Base Unit.
+*   **COGS (HPP - Harga Pokok Penjualan)**: The cost associated with producing a product.
+    *   **Live/Estimated COGS**: Calculated dynamically as `(Recipe Qty * Material base_cost) + Variant overhead_cost`.
+    *   **Manual Override**: User-defined `subtotal_cost` in a recipe line that takes precedence over systemic calculation.
+*   **Overhead Cost**: Standard additional cost per variant (e.g., packaging, waste buffer) defined in `product_variants`.
 
 ## 🏢 Multi-Tenancy & Structure
 *   **Tenant / Branch (Toko/Cabang)**: The operational unit. Almost all transactions, inventory, and product availability are filtered per Branch (`branch_id`).

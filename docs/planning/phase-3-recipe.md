@@ -12,6 +12,7 @@ Connect **Materials** (Raw Ingredients) to **Product Variants** (Sellable Items)
     - Support for "Waste" factor (optional but good for senior level).
 - **Live COGS Estimation**:
     - The API must dynamically calculate Estimated COGS based on `(Recipe Qty in Base Unit * Material base_cost) + Variant overhead_cost`.
+    - **Override Pattern**: Support manual `subtotal_cost` input per recipe line. If provided (greater than 0), the manual value is used instead of the systemic calculation.
     - This provides realtime Gross Margin feedback to the manager without affecting historical transaction COGS.
 - **Data Integrity (Crucial)**:
     - **Restricted Delete**: Materials and UOMs CANNOT be deleted if they are used in active recipes.
@@ -29,7 +30,7 @@ Connect **Materials** (Raw Ingredients) to **Product Variants** (Sellable Items)
 
 ## Implementation Steps
 - [x] **Schema Adjustment**: Add `base_cost` to materials and `overhead_cost` to variants. Setup `recipes` schema.
-- [ ] **Domain**: Define `Recipe` entity and interfaces in `internal/recipe/domain`.
-- [ ] **Repository**: Implement DB operations for Recipes.
-- [ ] **Usecase**: Logic to validate UOM conversion, calculate Live COGS, and prevent recursive recipes.
+- [x] **Domain**: Define `Recipe` entity and interfaces in `internal/recipe/domain`.
+- [x] **Repository**: Implement DB operations for Recipes.
+- [x] **Usecase**: Logic to validate UOM conversion, calculate Live COGS, and prevent recursive recipes.
 - [ ] **API**: `GET/POST/PUT/DELETE` for managing recipe of a variant.
