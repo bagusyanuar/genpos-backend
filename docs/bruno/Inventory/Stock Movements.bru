@@ -1,0 +1,22 @@
+meta {
+  name: Stock Movements (Audit Log)
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{host}}/inventories/movements?branch_id=&material_id=&page=1&limit=10
+  body: none
+  auth: bearer
+}
+
+query {
+  branch_id: 
+  material_id: 
+  page: 1
+  limit: 10
+}
+
+auth:bearer {
+  token: {{auth_token}}
+}

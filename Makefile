@@ -13,7 +13,7 @@ DB_URL=postgres://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)?ssl
 MIGRATION_PATH=./migrations
 MIGRATE=migrate
 
-.PHONY: help migrate-create migrate-up migrate-down migrate-force migrate-status migrate-drop
+.PHONY: help migrate-create migrate-up migrate-down migrate-force migrate-status migrate-drop migrate-fresh
 
 help: ## Show this help menu
 	@echo "Usage: make [target]"
@@ -43,6 +43,8 @@ migrate-status: ## Show migration status
 migrate-drop: ## Drop all tables in the database (CAUTION)
 	@echo "Dropping all tables..."
 	@$(MIGRATE) -path $(MIGRATION_PATH) -database "$(DB_URL)" drop -f
+
+migrate-fresh: migrate-drop migrate-up db-seed ## Drop all tables, run migrations and seed
 
 db-seed: ## Seed the database with initial data
 	@echo "Seeding database..."

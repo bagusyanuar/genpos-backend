@@ -44,3 +44,77 @@ func (u *inventoryUsecase) GetSummary(ctx context.Context, branchID uuid.UUID, f
 
 	return views, total, nil
 }
+
+func (u *inventoryUsecase) AdjustStock(ctx context.Context, move domain.StockMovement) error {
+	// Simple validation: quantity must be positive
+	if move.Quantity <= 0 {
+		return fmt.Errorf("quantity must be greater than 0")
+	}
+
+	if err := u.repo.UpdateStock(ctx, move); err != nil {
+		config.Log.Error("failed to adjust stock",
+			zap.Error(err),
+			zap.String("branch_id", move.BranchID.String()),
+			zap.String("material_id", move.MaterialID.String()),
+		)
+		return fmt.Errorf("inventory_uc.AdjustStock: %w", err)
+	}
+
+	return nil
+}
+
+func (u *inventoryUsecase) StockOpname(ctx context.Context, branchID uuid.UUID, materialID uuid.UUID, actualStock float64, note string) error {
+	// To perform opname, we first find current system stock
+	filter := domain.InventoryFilter{
+		BranchID:   branchID,
+		MaterialID: materialID,
+	}
+
+	invs, _, err := u.repo.Find(ctx, filter)
+	if err != nil {
+		return fmt.Errorf("failed to get current stock for opname: %w", err)
+	}
+
+	var currentStock float64
+	if len(invs) > 0 {
+		currentStock = invs[0].Stock
+	}
+
+	delta := actualStock - currentStock
+	// If delta is 0, we don't need to do anything, but recording an adjustment of 0 is fine for audit.
+
+	move := domain.StockMovement{
+		BranchID:   branchID,
+		MaterialID: materialID,
+		Type:       domain.MovementAdjust,
+		Quantity:   delta, // We send signed delta to repo for ADJUSTMENT type
+		Note:       fmt.Sprintf("[Opname] Actual: %.2f, System: %.2f. Note: %s", actualStock, currentStock, note),
+	}
+
+	// We'll trust the repo to handle the signed delta for ADJUST type or we can handle it here.
+	// My previous Repo implementation handles signed delta for Adjustment.
+	
+	if err := u.repo.UpdateStock(ctx, move); err != nil {
+		config.Log.Error("failed to record stock opname",
+			zap.Error(err),
+			zap.String("branch_id", branchID.String()),
+			zap.String("material_id", materialID.String()),
+		)
+		return fmt.Errorf("inventory_uc.StockOpname: %w", err)
+	}
+
+	return nil
+}
+
+func (u *inventoryUsecase) GetStockMovements(ctx context.Context, filter domain.InventoryFilter) ([]domain.StockMovement, int64, error) {
+	movements, total, err := u.repo.GetStockMovements(ctx, filter)
+	if err != nil {
+		config.Log.Error("failed to get stock movements",
+			zap.Error(err),
+			zap.String("branch_id", filter.BranchID.String()),
+		)
+		return nil, 0, fmt.Errorf("inventory_uc.GetStockMovements: %w", err)
+	}
+
+	return movements, total, nil
+}

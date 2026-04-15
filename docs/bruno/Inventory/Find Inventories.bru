@@ -1,0 +1,22 @@
+meta {
+  name: Find Inventories
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{host}}/inventories?branch_id=&search=&page=1&limit=10
+  body: none
+  auth: bearer
+}
+
+query {
+  branch_id: 
+  search: 
+  page: 1
+  limit: 10
+}
+
+auth:bearer {
+  token: {{auth_token}}
+}

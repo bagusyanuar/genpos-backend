@@ -1,0 +1,25 @@
+meta {
+  name: Stock Adjust
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{host}}/inventories/adjust
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{auth_token}}
+}
+
+body:json {
+  {
+    "material_id": "uuid-material",
+    "branch_id": "uuid-branch",
+    "type": "STOCK_IN",
+    "quantity": 50,
+    "note": "Initial stock addition"
+  }
+}

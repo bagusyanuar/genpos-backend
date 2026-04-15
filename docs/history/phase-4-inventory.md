@@ -26,6 +26,6 @@ Manage physical stock levels across branches through manual adjustments, stock t
 - `created_at`, `created_by` (UUID)
 
 ## Implementation Steps
-- [ ] **Domain**: Define `StockMovement` and `InventoryAdjustment` entities.
-- [ ] **Usecase**: Logic for atomic stock updates (Inventory + Movement Log).
-- [ ] **API**: Endpoints for manual stock in/out and Opname recording.
+- [x] **Domain**: Define `StockMovement` and `InventoryAdjustment` entities.
+- [x] **Usecase**: Logic for atomic stock updates (Inventory + Movement Log).
+- [x] **API**: Endpoints for manual stock in/out and Opname recording.

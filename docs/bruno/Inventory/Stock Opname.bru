@@ -1,0 +1,24 @@
+meta {
+  name: Stock Opname
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{host}}/inventories/opname
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{auth_token}}
+}
+
+body:json {
+  {
+    "material_id": "uuid-material",
+    "branch_id": "uuid-branch",
+    "actual_stock": 45,
+    "note": "Found 5 units damaged"
+  }
+}
