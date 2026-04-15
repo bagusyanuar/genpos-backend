@@ -1,0 +1,16 @@
+Pagination:
+  type: object
+  properties:
+    current_page:
+      type: integer
+      example: 1
+    total_page:
+      type: integer
+      example: 10
+    total_data:
+      type: integer
+      format: int64
+      example: 100
+    limit:
+      type: integer
+      example: 10

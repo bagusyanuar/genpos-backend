@@ -1,0 +1,39 @@
+LoginRequest:
+  type: object
+  required:
+    - email
+    - password
+  properties:
+    email:
+      type: string
+      format: email
+      example: "admin@genpos.com"
+    password:
+      type: string
+      format: password
+      example: "password123"
+
+LoginResponse:
+  type: object
+  properties:
+    access_token:
+      type: string
+      example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+
+UserResponse:
+  type: object
+  properties:
+    id:
+      type: string
+      format: uuid
+      example: "550e8400-e29b-41d4-a716-446655440000"
+    email:
+      type: string
+      example: "admin@genpos.com"
+    username:
+      type: string
+      example: "admin"
+    created_at:
+      type: string
+      format: date-time
+      example: "2024-01-01T00:00:00Z"

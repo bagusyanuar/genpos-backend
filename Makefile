@@ -47,3 +47,11 @@ migrate-drop: ## Drop all tables in the database (CAUTION)
 db-seed: ## Seed the database with initial data
 	@echo "Seeding database..."
 	@go run cmd/seed/main.go
+
+api-bundle: ## Bundle OpenAPI files into a single YAML
+	@echo "Bundling OpenAPI documentation..."
+	@npx @redocly/cli bundle docs/api/openapi/index.yaml -o docs/api/openapi.bundle.yaml
+
+api-lint: ## Lint OpenAPI files
+	@echo "Linting OpenAPI documentation..."
+	@npx @redocly/cli lint docs/api/openapi/index.yaml

@@ -1,4 +1,5 @@
 # Phase 3: Recipe & BOM (Bill of Materials)
+Completed At: 2026-04-15
 
 ## Goal
 Connect **Materials** (Raw Ingredients) to **Product Variants** (Sellable Items) to enable automated inventory deduction.
@@ -33,4 +34,4 @@ Connect **Materials** (Raw Ingredients) to **Product Variants** (Sellable Items)
 - [x] **Domain**: Define `Recipe` entity and interfaces in `internal/recipe/domain`.
 - [x] **Repository**: Implement DB operations for Recipes.
 - [x] **Usecase**: Logic to validate UOM conversion, calculate Live COGS, and prevent recursive recipes.
-- [ ] **API**: `GET/POST/PUT/DELETE` for managing recipe of a variant.
+- [x] **API**: `GET/POST/PUT/DELETE` for managing recipe of a variant.

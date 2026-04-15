@@ -1,0 +1,30 @@
+openapi: 3.0.3
+info:
+  title: GenPOS API Documentation
+  description: API Documentation for GenPOS Backend (POS System for F&B)
+  version: 1.0.0
+  contact:
+    name: GenPOS Team
+
+servers:
+  - url: http://localhost:8080/api/v1
+    description: Development Server
+
+tags:
+  - name: Auth
+    description: Authentication and Authorization
+
+paths:
+  /auth/login:
+    $ref: './paths/auth.yaml#/login'
+  /auth/refresh:
+    $ref: './paths/auth.yaml#/refresh'
+  /auth/me:
+    $ref: './paths/auth.yaml#/me'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

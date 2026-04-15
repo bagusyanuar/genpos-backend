@@ -1,0 +1,21 @@
+BaseResponse:
+  type: object
+  properties:
+    success:
+      type: boolean
+      example: true
+    message:
+      type: string
+      example: "Operation successful"
+
+ErrorResponse:
+  allOf:
+    - $ref: './base_response.yaml#/BaseResponse'
+    - type: object
+      properties:
+        success:
+          example: false
+        errors:
+          type: object
+          nullable: true
+          description: Detailed error information (e.g. validation errors)
