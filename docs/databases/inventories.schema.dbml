@@ -20,3 +20,28 @@ Table inventories {
 
 // Relationship to materials
 Ref: inventories.material_id > materials.id
+
+Table stock_movements {
+  id uuid [pk]
+  branch_id uuid [not null]
+  material_id uuid [not null]
+  type varchar(20) [not null, note: "STOCK_IN, STOCK_OUT, ADJUSTMENT, DEDUCTION"]
+  quantity decimal(15, 2) [not null, note: "Normalized to Base Unit"]
+  reference_id uuid [note: "Link to Order (Deduction) or Opname (Adjustment)"]
+  note text
+  created_at timestamp [default: `now()`]
+  created_by uuid [not null]
+  deleted_at timestamp
+
+  Indexes {
+    (branch_id, material_id) [name: "idx_stock_movements_branch_material"]
+    (branch_id, created_at) [name: "idx_stock_movements_branch_created"]
+    reference_id [name: "idx_stock_movements_reference_id"]
+    deleted_at [name: "idx_stock_movements_deleted_at"]
+  }
+}
+
+// Relationships
+Ref: stock_movements.material_id > materials.id
+Ref: stock_movements.branch_id > branches.id
+Ref: stock_movements.created_by > users.id
