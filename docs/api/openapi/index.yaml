@@ -1,14 +1,18 @@
 openapi: 3.0.3
 info:
-  title: GenPOS API Documentation
+  title: GenPOS v1
+  x-postman-id: "genpos-api-v1-main"
   description: API Documentation for GenPOS Backend (POS System for F&B)
   version: 1.0.0
   contact:
     name: GenPOS Team
 
 servers:
-  - url: http://localhost:8080/api/v1
+  - url: "{{host}}"
     description: Development Server
+    variables:
+      host:
+        default: http://localhost:8080/api/v1
 
 tags:
   - name: Auth
@@ -28,3 +32,4 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
+      x-postman-variable: "auth_token"

@@ -1,0 +1,21 @@
+meta {
+  name: Create Unit
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{host}}/units
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{auth_token}}
+}
+
+body:json {
+  {
+    "name": "Kilogram"
+  }
+}

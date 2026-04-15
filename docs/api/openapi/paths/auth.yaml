@@ -3,6 +3,24 @@ login:
     tags:
       - Auth
     summary: Login to get access token
+    x-postman-event:
+      - listen: test
+        script:
+          type: text/javascript
+          exec:
+            - |
+              var jsonData = pm.response.json();
+              if (jsonData.success && jsonData.data && jsonData.data.access_token) {
+                  // Save to Collection variable (robust, works without environment)
+                  pm.collectionVariables.set("auth_token", jsonData.data.access_token);
+                  pm.collectionVariables.set("bearerToken", jsonData.data.access_token);
+                  
+                  // Save to Environment variable (as backup)
+                  pm.environment.set("auth_token", jsonData.data.access_token);
+                  pm.environment.set("bearerToken", jsonData.data.access_token);
+                  
+                  console.log("Token saved to variables: auth_token & bearerToken");
+              }
     requestBody:
       required: true
       content:

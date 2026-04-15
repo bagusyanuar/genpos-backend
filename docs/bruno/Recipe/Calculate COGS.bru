@@ -1,0 +1,19 @@
+meta {
+  name: Calculate COGS
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{host}}/recipes/variant/:variant_id/cogs
+  body: none
+  auth: bearer
+}
+
+params:path {
+  variant_id: 
+}
+
+auth:bearer {
+  token: {{auth_token}}
+}

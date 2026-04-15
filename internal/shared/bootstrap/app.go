@@ -8,6 +8,7 @@ import (
 	"github.com/bagusyanuar/genpos-backend/internal/shared/middleware"
 	"github.com/bagusyanuar/genpos-backend/pkg/response"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/fiber/v2/middleware/requestid"
 	"go.uber.org/zap"
@@ -28,6 +29,11 @@ func Start(conf *config.Config, deps *container.Container) {
 	})
 
 	// Global Middlewares
+	app.Use(cors.New(cors.Config{
+		AllowOrigins: "*",
+		AllowHeaders: "Origin, Content-Type, Accept, Authorization, X-Request-ID",
+		AllowMethods: "GET, POST, PUT, DELETE, PATCH, OPTIONS",
+	}))
 	app.Use(requestid.New())   // 1. Generate Request ID
 	app.Use(middleware.Logger(conf)) // 2. Log using custom Zap middleware
 	app.Use(recover.New())     // 3. Panic recovery

@@ -1,13 +1,17 @@
 openapi: 3.0.3
 info:
-  title: GenPOS API Documentation
+  title: GenPOS v1
+  x-postman-id: genpos-api-v1-main
   description: API Documentation for GenPOS Backend (POS System for F&B)
   version: 1.0.0
   contact:
     name: GenPOS Team
 servers:
-  - url: http://localhost:8080/api/v1
+  - url: '{{host}}'
     description: Development Server
+    variables:
+      host:
+        default: http://localhost:8080/api/v1
 tags:
   - name: Auth
     description: Authentication and Authorization
@@ -17,6 +21,24 @@ paths:
       tags:
         - Auth
       summary: Login to get access token
+      x-postman-event:
+        - listen: test
+          script:
+            type: text/javascript
+            exec:
+              - |
+                var jsonData = pm.response.json();
+                if (jsonData.success && jsonData.data && jsonData.data.access_token) {
+                    // Save to Collection variable (robust, works without environment)
+                    pm.collectionVariables.set("auth_token", jsonData.data.access_token);
+                    pm.collectionVariables.set("bearerToken", jsonData.data.access_token);
+                    
+                    // Save to Environment variable (as backup)
+                    pm.environment.set("auth_token", jsonData.data.access_token);
+                    pm.environment.set("bearerToken", jsonData.data.access_token);
+                    
+                    console.log("Token saved to variables: auth_token & bearerToken");
+                }
       requestBody:
         required: true
         content:
@@ -105,6 +127,7 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
+      x-postman-variable: auth_token
   schemas:
     LoginRequest:
       type: object

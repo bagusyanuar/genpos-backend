@@ -1,0 +1,53 @@
+meta {
+  name: Get Unit By ID
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{host}}/units/:id
+  body: none
+  auth: bearer
+}
+
+params:path {
+  id: 
+}
+
+auth:bearer {
+  token: {{auth_token}}
+}
+
+docs {
+  ### Response Examples
+
+  #### 🟢 200 OK (Success)
+  ```json
+  {
+    "success": true,
+    "message": "unit fetched successfully",
+    "data": {
+      "id": "c8eb42e6-921f-4010-8971-384b01ff85f3",
+      "name": "Kilogram",
+      "created_at": "2026-04-15T22:14:10.692Z",
+      "updated_at": "2026-04-15T22:14:10.692Z"
+    }
+  }
+  ```
+
+  #### 🔴 401 Unauthorized
+  ```json
+  {
+    "success": false,
+    "message": "invalid or expired token"
+  }
+  ```
+
+  #### 🟡 404 Not Found
+  ```json
+  {
+    "success": false,
+    "message": "unit not found"
+  }
+  ```
+}

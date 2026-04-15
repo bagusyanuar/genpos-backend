@@ -1,0 +1,32 @@
+meta {
+  name: Sync Recipe
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{host}}/recipes/variant/:variant_id
+  body: json
+  auth: bearer
+}
+
+params:path {
+  variant_id: 
+}
+
+auth:bearer {
+  token: {{auth_token}}
+}
+
+body:json {
+  {
+    "recipes": [
+      {
+        "material_id": "uuid-material-1",
+        "uom_id": "uuid-uom-1",
+        "quantity": 2.5,
+        "subtotal_cost": 0
+      }
+    ]
+  }
+}

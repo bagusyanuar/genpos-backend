@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "GenPOS - Backend",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}

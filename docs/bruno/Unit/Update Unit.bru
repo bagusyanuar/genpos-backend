@@ -1,0 +1,25 @@
+meta {
+  name: Update Unit
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{host}}/units/:id
+  body: json
+  auth: bearer
+}
+
+params:path {
+  id: 
+}
+
+auth:bearer {
+  token: {{auth_token}}
+}
+
+body:json {
+  {
+    "name": "Pcs (Updated)"
+  }
+}

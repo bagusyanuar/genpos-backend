@@ -1,0 +1,55 @@
+meta {
+  name: Find Units
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{host}}/units?search=&page=1&limit=10
+  body: none
+  auth: bearer
+}
+
+query {
+  search: 
+  page: 1
+  limit: 10
+}
+
+auth:bearer {
+  token: {{auth_token}}
+}
+
+docs {
+  ### Response Examples
+
+  #### 🟢 200 OK (Success)
+  ```json
+  {
+    "success": true,
+    "message": "units found successfully",
+    "data": [
+      {
+        "id": "c8eb42e6-921f-4010-8971-384b01ff85f3",
+        "name": "Kilogram",
+        "created_at": "2026-04-15T22:14:10.692Z",
+        "updated_at": "2026-04-15T22:14:10.692Z"
+      }
+    ],
+    "pagination": {
+      "current_page": 1,
+      "total_page": 1,
+      "total_data": 1,
+      "limit": 10
+    }
+  }
+  ```
+
+  #### 🔴 401 Unauthorized
+  ```json
+  {
+    "success": false,
+    "message": "invalid or expired token"
+  }
+  ```
+}

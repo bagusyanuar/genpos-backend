@@ -3,7 +3,7 @@ package response
 type APIResponse[T any] struct {
 	Success    bool        `json:"success"`
 	Message    string      `json:"message"`
-	Data       T           `json:"data,omitempty"`
+	Data       T           `json:"data"`
 	Errors     any         `json:"errors,omitempty"`
 	Pagination *Pagination `json:"pagination,omitempty"`
 }
