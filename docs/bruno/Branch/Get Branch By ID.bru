@@ -1,0 +1,46 @@
+meta {
+  name: Get Branch By ID
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{host}}/branches/:id
+  body: none
+  auth: bearer
+}
+
+params:path {
+  id: 
+}
+
+auth:bearer {
+  token: {{auth_token}}
+}
+
+docs {
+  ### Response Examples
+  
+  #### 🟢 200 OK (Success)
+  ```json
+  {
+    "success": true,
+    "message": "branch fetched successfully",
+    "data": {
+      "id": "uuid-branch",
+      "name": "Main Store",
+      "is_default": true,
+      "created_at": "...",
+      "updated_at": "..."
+    }
+  }
+  ```
+  
+  #### 🔴 404 Not Found
+  ```json
+  {
+    "success": false,
+    "message": "branch not found"
+  }
+  ```
+}

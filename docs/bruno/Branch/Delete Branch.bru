@@ -1,0 +1,32 @@
+meta {
+  name: Delete Branch
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{host}}/branches/:id
+  body: none
+  auth: bearer
+}
+
+params:path {
+  id: 
+}
+
+auth:bearer {
+  token: {{auth_token}}
+}
+
+docs {
+  ### Response Examples
+  
+  #### 🟢 200 OK
+  ```json
+  {
+    "success": true,
+    "message": "branch deleted successfully",
+    "data": null
+  }
+  ```
+}

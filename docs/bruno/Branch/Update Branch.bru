@@ -1,0 +1,45 @@
+meta {
+  name: Update Branch
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{host}}/branches/:id
+  body: json
+  auth: bearer
+}
+
+params:path {
+  id: 
+}
+
+auth:bearer {
+  token: {{auth_token}}
+}
+
+body:json {
+  {
+    "name": "Branch Kuningan Updated",
+    "is_default": true
+  }
+}
+
+docs {
+  ### Response Examples
+  
+  #### 🟢 200 OK
+  ```json
+  {
+    "success": true,
+    "message": "branch updated successfully",
+    "data": {
+      "id": "uuid-branch",
+      "name": "Branch Kuningan Updated",
+      "is_default": true,
+      "created_at": "...",
+      "updated_at": "..."
+    }
+  }
+  ```
+}

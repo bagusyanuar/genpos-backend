@@ -1,0 +1,41 @@
+meta {
+  name: Create Branch
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{host}}/branches
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{auth_token}}
+}
+
+body:json {
+  {
+    "name": "Branch Kuningan",
+    "is_default": false
+  }
+}
+
+docs {
+  ### Response Examples
+  
+  #### 🟢 201 Created
+  ```json
+  {
+    "success": true,
+    "message": "branch created successfully",
+    "data": {
+      "id": "uuid-new-branch",
+      "name": "Branch Kuningan",
+      "is_default": false,
+      "created_at": "...",
+      "updated_at": "..."
+    }
+  }
+  ```
+}

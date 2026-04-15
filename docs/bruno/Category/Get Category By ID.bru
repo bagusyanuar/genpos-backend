@@ -1,13 +1,17 @@
 meta {
-  name: Get Profile (Me)
+  name: Get Category By ID
   type: http
   seq: 2
 }
 
 get {
-  url: {{host}}/auth/me
+  url: {{host}}/categories/:id
   body: none
   auth: bearer
+}
+
+params:path {
+  id: 
 }
 
 auth:bearer {
@@ -21,12 +25,11 @@ docs {
   ```json
   {
     "success": true,
-    "message": "profile fetched successfully",
+    "message": "category fetched successfully",
     "data": {
-      "id": "uuid-user",
-      "email": "admin@genpos.com",
-      "username": "admin",
-      "role": "ADMIN"
+      "id": "uuid-category",
+      "name": "Ingredients",
+      "type": "MATERIAL"
     }
   }
   ```

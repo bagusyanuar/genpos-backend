@@ -30,3 +30,35 @@ body:json {
     ]
   }
 }
+
+docs {
+  ### Response Examples
+  
+  #### 🟢 200 OK
+  ```json
+  {
+    "success": true,
+    "message": "recipe synced successfully",
+    "data": null
+  }
+  ```
+
+  #### 🔴 400 Bad Request
+  ```json
+  {
+    "success": false,
+    "message": "Invalid input data",
+    "errors": {
+      "quantity": "must be a positive number"
+    }
+  }
+  ```
+
+  #### 🔴 401 Unauthorized
+  ```json
+  {
+    "success": false,
+    "message": "Unauthorized"
+  }
+  ```
+}

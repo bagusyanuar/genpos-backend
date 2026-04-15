@@ -1,0 +1,44 @@
+meta {
+  name: Find Categories
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{host}}/categories?type=MATERIAL&search=&page=1&limit=10
+  body: none
+  auth: bearer
+}
+
+query {
+  type: MATERIAL
+  search: 
+  page: 1
+  limit: 10
+}
+
+auth:bearer {
+  token: {{auth_token}}
+}
+
+docs {
+  ### Response Examples
+  
+  #### 🟢 200 OK
+  ```json
+  {
+    "success": true,
+    "message": "categories found successfully",
+    "data": [
+      {
+        "id": "uuid-category",
+        "name": "Ingredients",
+        "slug": "ingredients",
+        "type": "MATERIAL",
+        "is_active": true
+      }
+    ],
+    "pagination": { ... }
+  }
+  ```
+}

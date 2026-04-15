@@ -1,0 +1,43 @@
+meta {
+  name: Create Category
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{host}}/categories
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{auth_token}}
+}
+
+body:json {
+  {
+    "name": "Coffee",
+    "type": "PRODUCT",
+    "is_active": true,
+    "sort_order": 1
+  }
+}
+
+docs {
+  ### Response Examples
+  
+  #### 🟢 201 Created
+  ```json
+  {
+    "success": true,
+    "message": "category created successfully",
+    "data": {
+      "id": "uuid-category",
+      "name": "Coffee",
+      "type": "PRODUCT",
+      "is_active": true,
+      "created_at": "..."
+    }
+  }
+  ```
+}

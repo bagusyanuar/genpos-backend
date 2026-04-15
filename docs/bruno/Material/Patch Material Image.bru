@@ -1,0 +1,38 @@
+meta {
+  name: Patch Material Image
+  type: http
+  seq: 6
+}
+
+patch {
+  url: {{host}}/materials/:id/image
+  body: json
+  auth: bearer
+}
+
+params:path {
+  id: 
+}
+
+auth:bearer {
+  token: {{auth_token}}
+}
+
+body:json {
+  {
+    "image_url": "https://storage.com/new-image.png"
+  }
+}
+
+docs {
+  ### Response Examples
+  
+  #### 🟢 200 OK
+  ```json
+  {
+    "success": true,
+    "message": "material image updated successfully",
+    "data": null
+  }
+  ```
+}

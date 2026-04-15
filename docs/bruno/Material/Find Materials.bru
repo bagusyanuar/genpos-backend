@@ -1,0 +1,43 @@
+meta {
+  name: Find Materials
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{host}}/materials?search=&page=1&limit=10
+  body: none
+  auth: bearer
+}
+
+query {
+  search: 
+  page: 1
+  limit: 10
+}
+
+auth:bearer {
+  token: {{auth_token}}
+}
+
+docs {
+  ### Response Examples
+  
+  #### 🟢 200 OK
+  ```json
+  {
+    "success": true,
+    "message": "materials found successfully",
+    "data": [
+      {
+        "id": "uuid-material",
+        "name": "Full Cream Milk",
+        "sku": "MAT-MILK-01",
+        "base_unit": "Litre",
+        "image_url": "..."
+      }
+    ],
+    "pagination": { ... }
+  }
+  ```
+}

@@ -1,0 +1,49 @@
+meta {
+  name: Sync Material UOMs
+  type: http
+  seq: 7
+}
+
+put {
+  url: {{host}}/materials/:id/uoms
+  body: json
+  auth: bearer
+}
+
+params:path {
+  id: 
+}
+
+auth:bearer {
+  token: {{auth_token}}
+}
+
+body:json {
+  {
+    "uoms": [
+      {
+        "unit_id": "uuid-unit-gram",
+        "conversion_factor": 1,
+        "is_buy_unit": false
+      },
+      {
+        "unit_id": "uuid-unit-kg",
+        "conversion_factor": 1000,
+        "is_buy_unit": true
+      }
+    ]
+  }
+}
+
+docs {
+  ### Response Examples
+  
+  #### 🟢 200 OK
+  ```json
+  {
+    "success": true,
+    "message": "material UOMs synced successfully",
+    "data": null
+  }
+  ```
+}

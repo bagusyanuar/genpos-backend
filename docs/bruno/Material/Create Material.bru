@@ -1,0 +1,49 @@
+meta {
+  name: Create Material
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{host}}/materials
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{auth_token}}
+}
+
+body:json {
+  {
+    "name": "Coffee Beans Arabica",
+    "sku": "MAT-COF-01",
+    "category_id": "uuid-category",
+    "base_unit_id": "uuid-unit-gram",
+    "is_active": true,
+    "uoms": [
+      {
+        "unit_id": "uuid-unit-kg",
+        "conversion_factor": 1000,
+        "is_buy_unit": true
+      }
+    ]
+  }
+}
+
+docs {
+  ### Response Examples
+  
+  #### 🟢 201 Created
+  ```json
+  {
+    "success": true,
+    "message": "material created successfully",
+    "data": {
+      "id": "uuid-material",
+      "name": "Coffee Beans Arabica",
+      "sku": "MAT-COF-01"
+    }
+  }
+  ```
+}

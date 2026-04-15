@@ -1,17 +1,16 @@
 meta {
-  name: Inventory Summary
+  name: Find Branches
   type: http
-  seq: 2
+  seq: 1
 }
 
 get {
-  url: {{host}}/inventories/summary?branch_id=&search=&page=1&limit=10
+  url: {{host}}/branches?search=&page=1&limit=10
   body: none
   auth: bearer
 }
 
 query {
-  branch_id: 
   search: 
   page: 1
   limit: 10
@@ -28,13 +27,14 @@ docs {
   ```json
   {
     "success": true,
-    "message": "inventory summary found successfully",
+    "message": "branches found successfully",
     "data": [
       {
-        "id": "uuid-material",
-        "sku": "MAT-001",
-        "name": "Coffee Beans",
-        "total_stock": 150
+        "id": "uuid-branch-1",
+        "name": "Main Store",
+        "is_default": true,
+        "created_at": "2026-04-15T...",
+        "updated_at": "2026-04-15T..."
       }
     ],
     "pagination": {
