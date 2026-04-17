@@ -3,8 +3,8 @@ Table recipes {
   product_variant_id uuid [ref: > product_variants.id, not null]
   material_id uuid [ref: > materials.id, not null]
   uom_id uuid [ref: > units.id, not null, note: "Unit used in this recipe, must be convertible to Material's base unit"]
-  quantity decimal(15,3) [not null, default: 0]
-  subtotal_cost decimal(15,2) [not null, default: 0, note: "Manual cost override for this ingredient line"]
+  quantity decimal(15, 4) [not null, default: 0]
+  subtotal_cost decimal(15, 4) [not null, default: 0, note: "Manual cost override for this ingredient line"]
   created_at timestamp [default: `now()`]
   updated_at timestamp [default: `now()`]
   deleted_at timestamp

@@ -2,8 +2,8 @@ Table inventories {
   id uuid [pk]
   material_id uuid [not null]
   branch_id uuid [not null]
-  stock decimal(15, 2) [not null, default: 0, note: "Current stock level (Strictly in Base Unit)"]
-  min_stock decimal(15, 2) [not null, default: 0, note: "Reorder point (Strictly in Base Unit)"]
+  stock decimal(15, 4) [not null, default: 0, note: "Current stock level (Strictly in Base Unit)"]
+  min_stock decimal(15, 4) [not null, default: 0, note: "Reorder point (Strictly in Base Unit)"]
   created_at timestamp [default: `now()`]
   updated_at timestamp
   deleted_at timestamp
@@ -26,7 +26,7 @@ Table stock_movements {
   branch_id uuid [not null]
   material_id uuid [not null]
   type varchar(20) [not null, note: "STOCK_IN, STOCK_OUT, ADJUSTMENT, DEDUCTION"]
-  quantity decimal(15, 2) [not null, note: "Normalized to Base Unit"]
+  quantity decimal(15, 4) [not null, note: "Normalized to Base Unit"]
   reference_id uuid [note: "Link to Order (Deduction) or Opname (Adjustment)"]
   note text
   created_at timestamp [default: `now()`]

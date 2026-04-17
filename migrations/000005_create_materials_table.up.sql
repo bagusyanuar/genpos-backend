@@ -6,7 +6,7 @@ CREATE TABLE materials (
     description TEXT,
     material_type VARCHAR(50),
     image_url TEXT,
-    base_cost DECIMAL(15,2) NOT NULL DEFAULT 0,
+    base_cost DECIMAL(15, 4) NOT NULL DEFAULT 0,
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,

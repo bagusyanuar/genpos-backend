@@ -16,16 +16,21 @@ auth:bearer {
 
 body:json {
   {
-    "name": "Coffee Beans Arabica",
-    "sku": "MAT-COF-01",
-    "category_id": "uuid-category",
-    "base_unit_id": "uuid-unit-gram",
+    "name": "Greenfield Fresh Milk",
+    "sku": "MAT-FM-01",
+    "category_id": "23336d16-330d-4679-8215-dd35d5fb880f",
+    "material_type": "RAW",
     "is_active": true,
     "uoms": [
       {
-        "unit_id": "uuid-unit-kg",
-        "conversion_factor": 1000,
-        "is_buy_unit": true
+        "unit_id": "537a762f-df02-4b57-a984-e3ae8f7586ed",
+        "multiplier": 1,
+        "is_default": true
+      },
+      {
+        "unit_id": "4400d178-2148-4ce8-9e55-cac476241626",
+        "multiplier": 1000,
+        "is_default": false
       }
     ]
   }

@@ -18,8 +18,8 @@ func NewInventoryUsecase(repo domain.InventoryRepository) domain.InventoryUsecas
 	return &inventoryUsecase{repo: repo}
 }
 
-func (u *inventoryUsecase) Find(ctx context.Context, filter domain.InventoryFilter) ([]domain.Inventory, int64, error) {
-	inventories, total, err := u.repo.Find(ctx, filter)
+func (u *inventoryUsecase) Find(ctx context.Context, filter domain.InventoryFilter) ([]domain.MaterialInventoryView, int64, error) {
+	views, total, err := u.repo.Find(ctx, filter)
 	if err != nil {
 		config.Log.Error("failed to find inventories",
 			zap.Error(err),
@@ -29,7 +29,7 @@ func (u *inventoryUsecase) Find(ctx context.Context, filter domain.InventoryFilt
 		return nil, 0, fmt.Errorf("inventory_uc.Find: %w", err)
 	}
 
-	return inventories, total, nil
+	return views, total, nil
 }
 
 func (u *inventoryUsecase) GetSummary(ctx context.Context, branchID uuid.UUID, filter domain.InventoryFilter) ([]domain.MaterialStockView, int64, error) {
@@ -70,14 +70,14 @@ func (u *inventoryUsecase) StockOpname(ctx context.Context, branchID uuid.UUID, 
 		MaterialID: materialID,
 	}
 
-	invs, _, err := u.repo.Find(ctx, filter)
+	views, _, err := u.repo.Find(ctx, filter)
 	if err != nil {
 		return fmt.Errorf("failed to get current stock for opname: %w", err)
 	}
 
 	var currentStock float64
-	if len(invs) > 0 {
-		currentStock = invs[0].Stock
+	if len(views) > 0 {
+		currentStock = views[0].Stock
 	}
 
 	delta := actualStock - currentStock
@@ -91,9 +91,6 @@ func (u *inventoryUsecase) StockOpname(ctx context.Context, branchID uuid.UUID, 
 		Note:       fmt.Sprintf("[Opname] Actual: %.2f, System: %.2f. Note: %s", actualStock, currentStock, note),
 	}
 
-	// We'll trust the repo to handle the signed delta for ADJUST type or we can handle it here.
-	// My previous Repo implementation handles signed delta for Adjustment.
-	
 	if err := u.repo.UpdateStock(ctx, move); err != nil {
 		config.Log.Error("failed to record stock opname",
 			zap.Error(err),

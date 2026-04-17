@@ -2,7 +2,7 @@ Table materials {
   id uuid [pk]
   sku varchar(50) [not null, unique, note: "Unique Operational Key"]
   name varchar(255) [not null]
-  base_cost decimal(15,2) [not null, default: 0, note: "Moving Average Cost per Base Unit"]
+  base_cost decimal(15, 4) [not null, default: 0, note: "Moving Average Cost per Base Unit"]
   created_at timestamp [default: `now()`]
   updated_at timestamp
   deleted_at timestamp [note: "Soft Delete untuk menjaga relasi resep (BOM)"]

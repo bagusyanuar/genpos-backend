@@ -21,8 +21,8 @@ CREATE TABLE inventories (
     id UUID PRIMARY KEY,
     material_id UUID NOT NULL,
     branch_id UUID NOT NULL,
-    stock DECIMAL(15, 2) NOT NULL DEFAULT 0,
-    min_stock DECIMAL(15, 2) NOT NULL DEFAULT 0,
+    stock DECIMAL(15, 4) NOT NULL DEFAULT 0,
+    min_stock DECIMAL(15, 4) NOT NULL DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,
     deleted_at TIMESTAMP

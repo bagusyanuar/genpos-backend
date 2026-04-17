@@ -13,8 +13,8 @@ type Inventory struct {
 	ID         uuid.UUID      `gorm:"type:uuid;primaryKey" json:"id"`
 	MaterialID uuid.UUID      `gorm:"type:uuid;not null;index" json:"material_id"`
 	BranchID   uuid.UUID      `gorm:"type:uuid;not null;index" json:"branch_id"`
-	Stock      float64        `gorm:"type:decimal(15,2);not null;default:0" json:"stock"`
-	MinStock   float64        `gorm:"type:decimal(15,2);not null;default:0" json:"min_stock"`
+	Stock      float64        `gorm:"type:decimal(15,4);not null;default:0" json:"stock"`
+	MinStock   float64        `gorm:"type:decimal(15,4);not null;default:0" json:"min_stock"`
 	CreatedAt  time.Time      `json:"created_at"`
 	UpdatedAt  time.Time      `json:"updated_at"`
 	DeletedAt  gorm.DeletedAt `gorm:"index" json:"deleted_at,omitempty"`
@@ -39,7 +39,7 @@ type StockMovement struct {
 	BranchID    uuid.UUID      `gorm:"type:uuid;not null;index" json:"branch_id"`
 	MaterialID  uuid.UUID      `gorm:"type:uuid;not null;index" json:"material_id"`
 	Type        string         `gorm:"type:varchar(20);not null" json:"type"`
-	Quantity    float64        `gorm:"type:decimal(15,2);not null" json:"quantity"`
+	Quantity    float64        `gorm:"type:decimal(15,4);not null" json:"quantity"`
 	ReferenceID *uuid.UUID     `gorm:"type:uuid" json:"reference_id,omitempty"`
 	Note        string         `gorm:"type:text" json:"note"`
 	CreatedAt   time.Time      `json:"created_at"`
@@ -62,7 +62,7 @@ type InventoryFilter struct {
 }
 
 type InventoryRepository interface {
-	Find(ctx context.Context, filter InventoryFilter) ([]Inventory, int64, error)
+	Find(ctx context.Context, filter InventoryFilter) ([]MaterialInventoryView, int64, error)
 	GetSummary(ctx context.Context, branchID uuid.UUID, filter InventoryFilter) ([]MaterialStockView, int64, error)
 	// UpdateStock performs atomic inventory update and creates a stock movement record.
 	// quantity can be positive (increment) or negative (decrement).
@@ -72,11 +72,32 @@ type InventoryRepository interface {
 }
 
 type InventoryUsecase interface {
-	Find(ctx context.Context, filter InventoryFilter) ([]Inventory, int64, error)
+	Find(ctx context.Context, filter InventoryFilter) ([]MaterialInventoryView, int64, error)
 	GetSummary(ctx context.Context, branchID uuid.UUID, filter InventoryFilter) ([]MaterialStockView, int64, error)
 	AdjustStock(ctx context.Context, move StockMovement) error
 	StockOpname(ctx context.Context, branchID uuid.UUID, materialID uuid.UUID, actualStock float64, note string) error
 	GetStockMovements(ctx context.Context, filter InventoryFilter) ([]StockMovement, int64, error)
+}
+
+// MaterialInventoryView represents a expanded view of Inventory including material master data.
+type MaterialInventoryView struct {
+	ID           *uuid.UUID        `json:"inventory_id"` // Null if no record in inventories table
+	MaterialID   uuid.UUID         `json:"material_id"`
+	MaterialSKU  string            `json:"material_sku"`
+	MaterialName string            `json:"material_name"`
+	Stock        float64           `json:"stock"`
+	MinStock     float64           `json:"min_stock"`
+	UpdatedAt    *time.Time        `json:"updated_at"`
+	UOMs         []MaterialUOMView `gorm:"-" json:"uoms"`
+}
+
+// MaterialUOMView represents a preloaded view of an associated UOM with its unit name.
+type MaterialUOMView struct {
+	ID         uuid.UUID `json:"id"`
+	UnitID     uuid.UUID `json:"unit_id"`
+	UnitName   string    `json:"unit_name"`
+	Multiplier float64   `json:"multiplier"`
+	IsDefault  bool      `json:"is_default"`
 }
 
 // MaterialStockView represents a unified view of Material master data and its total stock from inventories.

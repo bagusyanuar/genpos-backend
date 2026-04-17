@@ -13,8 +13,8 @@ type Recipe struct {
 	ProductVariantID uuid.UUID      `gorm:"type:uuid;not null;index" json:"product_variant_id"`
 	MaterialID       uuid.UUID      `gorm:"type:uuid;not null;index" json:"material_id"`
 	UomID            uuid.UUID      `gorm:"type:uuid;not null" json:"uom_id"`
-	Quantity         float64        `gorm:"type:decimal(15,3);not null;default:0" json:"quantity"`
-	SubtotalCost     float64        `gorm:"type:decimal(15,2);not null;default:0" json:"subtotal_cost"`
+	Quantity         float64        `gorm:"type:decimal(15,4);not null;default:0" json:"quantity"`
+	SubtotalCost     float64        `gorm:"type:decimal(15,4);not null;default:0" json:"subtotal_cost"`
 	CreatedAt        time.Time      `json:"created_at"`
 	UpdatedAt        time.Time      `json:"updated_at"`
 	DeletedAt        gorm.DeletedAt `gorm:"index" json:"deleted_at,omitempty"`

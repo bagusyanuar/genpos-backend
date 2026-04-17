@@ -1,38 +1,121 @@
 package http
 
 import (
+	"fmt"
+	"math"
+	"sort"
 	"time"
 
 	"github.com/bagusyanuar/genpos-backend/internal/inventory/domain"
 	"github.com/google/uuid"
 )
 
-type InventoryResponse struct {
+type MaterialUOMResponse struct {
 	ID         uuid.UUID `json:"id"`
-	MaterialID uuid.UUID `json:"material_id"`
-	BranchID   uuid.UUID `json:"branch_id"`
+	UnitID     uuid.UUID `json:"unit_id"`
+	UnitName   string    `json:"unit_name"`
+	Multiplier float64   `json:"multiplier"`
+	IsDefault  bool      `json:"is_default"`
 	Stock      float64   `json:"stock"`
-	MinStock   float64   `json:"min_stock"`
-	CreatedAt  time.Time `json:"created_at"`
-	UpdatedAt  time.Time `json:"updated_at"`
 }
 
-func ToInventoryResponse(i domain.Inventory) InventoryResponse {
+type InventoryResponse struct {
+	ID             *uuid.UUID            `json:"inventory_id"`
+	MaterialID     uuid.UUID             `json:"material_id"`
+	MaterialSKU    string                `json:"material_sku"`
+	MaterialName   string                `json:"material_name"`
+	Stock          float64               `json:"stock"`
+	FormattedStock []string              `json:"formatted_stock"`
+	MinStock       float64               `json:"min_stock"`
+	UpdatedAt      *time.Time            `json:"updated_at"`
+	UOMs           []MaterialUOMResponse `json:"uoms"`
+}
+
+func formatStock(baseStock float64, uoms []domain.MaterialUOMView) []string {
+	if len(uoms) == 0 {
+		return []string{fmt.Sprintf("%g", math.Round(baseStock*10000)/10000)}
+	}
+
+	sortedUOMs := make([]domain.MaterialUOMView, len(uoms))
+	copy(sortedUOMs, uoms)
+	// Sort by Multiplier DESCENDING (Largest unit first)
+	sort.Slice(sortedUOMs, func(i, j int) bool {
+		return sortedUOMs[i].Multiplier > sortedUOMs[j].Multiplier
+	})
+
+	isNegative := baseStock < 0
+	currentBaseVal := math.Abs(baseStock)
+	var parts []string
+
+	for i, uom := range sortedUOMs {
+		if uom.Multiplier <= 0 {
+			continue // Safety check
+		}
+
+		unitVal := currentBaseVal / uom.Multiplier
+
+		if i == len(sortedUOMs)-1 {
+			if unitVal > 0 || len(parts) == 0 {
+				roundedVal := math.Round(unitVal*10000) / 10000
+				parts = append(parts, fmt.Sprintf("%g %s", roundedVal, uom.UnitName))
+			}
+			break
+		}
+
+		intPart := math.Trunc(unitVal)
+		if intPart > 0 {
+			parts = append(parts, fmt.Sprintf("%g %s", intPart, uom.UnitName))
+		}
+
+		remUnit := unitVal - intPart
+		currentBaseVal = remUnit * uom.Multiplier
+
+		if currentBaseVal <= 0.0001 {
+			break
+		}
+	}
+
+	if isNegative && len(parts) > 0 {
+		parts[0] = "- " + parts[0]
+	}
+	return parts
+}
+
+func ToInventoryResponse(v domain.MaterialInventoryView) InventoryResponse {
+	uoms := make([]MaterialUOMResponse, 0)
+	for _, uom := range v.UOMs {
+		uomStock := float64(0)
+		if uom.Multiplier > 0 {
+			uomStock = math.Round((v.Stock/uom.Multiplier)*10000) / 10000
+		}
+
+		uoms = append(uoms, MaterialUOMResponse{
+			ID:         uom.ID,
+			UnitID:     uom.UnitID,
+			UnitName:   uom.UnitName,
+			Multiplier: uom.Multiplier,
+			IsDefault:  uom.IsDefault,
+			Stock:      uomStock,
+		})
+	}
+
 	return InventoryResponse{
-		ID:         i.ID,
-		MaterialID: i.MaterialID,
-		BranchID:   i.BranchID,
-		Stock:      i.Stock,
-		MinStock:   i.MinStock,
-		CreatedAt:  i.CreatedAt,
-		UpdatedAt:  i.UpdatedAt,
+		ID:             v.ID,
+		MaterialID:     v.MaterialID,
+		MaterialSKU:    v.MaterialSKU,
+		MaterialName:   v.MaterialName,
+		Stock:          v.Stock,
+		FormattedStock: formatStock(v.Stock, v.UOMs),
+		MinStock:       v.MinStock,
+		UpdatedAt:      v.UpdatedAt,
+		UOMs:           uoms,
 	}
 }
 
-func ToInventoryListResponse(inventories []domain.Inventory) []InventoryResponse {
+func ToInventoryListResponse(views []domain.MaterialInventoryView) []InventoryResponse {
 	res := make([]InventoryResponse, 0)
-	for _, i := range inventories {
-		res = append(res, ToInventoryResponse(i))
+	for _, v := range views {
+		res = append(res, ToInventoryResponse(v))
 	}
 	return res
 }

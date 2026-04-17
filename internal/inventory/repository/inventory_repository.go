@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/bagusyanuar/genpos-backend/internal/inventory/domain"
@@ -19,41 +20,81 @@ func NewInventoryRepository(db *gorm.DB) domain.InventoryRepository {
 	return &inventoryRepository{db: db}
 }
 
-func (r *inventoryRepository) Find(ctx context.Context, filter domain.InventoryFilter) ([]domain.Inventory, int64, error) {
-	var inventories []domain.Inventory
+func (r *inventoryRepository) Find(ctx context.Context, filter domain.InventoryFilter) ([]domain.MaterialInventoryView, int64, error) {
+	var views []domain.MaterialInventoryView
 	var total int64
 
-	query := r.db.WithContext(ctx).Model(&domain.Inventory{})
-
-	// Strict isolated filter for multi-tenancy
-	query = query.Where("branch_id = ?", filter.BranchID)
-
-	// Material specific filter if provided
-	if filter.MaterialID != uuid.Nil {
-		query = query.Where("material_id = ?", filter.MaterialID)
-	}
+	// Start from materials table to ensure all materials are returned
+	baseQuery := r.db.WithContext(ctx).Table("materials").Where("materials.deleted_at IS NULL")
 
 	if filter.Search != "" {
-		// Needs to join material table to search by name/SKU
-		query = query.Joins("LEFT JOIN materials ON inventories.material_id = materials.id").
-			Where("materials.name ILIKE ? OR materials.sku ILIKE ?", "%"+filter.Search+"%", "%"+filter.Search+"%")
+		baseQuery = baseQuery.Where("materials.name ILIKE ? OR materials.sku ILIKE ?", "%"+filter.Search+"%", "%"+filter.Search+"%")
 	}
 
-	if err := query.Count(&total).Error; err != nil {
+	if filter.MaterialID != uuid.Nil {
+		baseQuery = baseQuery.Where("materials.id = ?", filter.MaterialID)
+	}
+
+	if err := baseQuery.Count(&total).Error; err != nil {
 		return nil, 0, fmt.Errorf("inventory_repo.Find.Count: %w", err)
 	}
 
-	err := query.
+	sort := filter.GetSort()
+	if !strings.Contains(sort, ".") {
+		sort = "materials." + sort
+	}
+
+	err := baseQuery.
+		Select("inventories.id, materials.id as material_id, materials.sku as material_sku, materials.name as material_name, COALESCE(inventories.stock, 0) as stock, COALESCE(inventories.min_stock, 0) as min_stock, inventories.updated_at").
+		Joins("LEFT JOIN inventories ON materials.id = inventories.material_id AND inventories.branch_id = ? AND inventories.deleted_at IS NULL", filter.BranchID).
+		Order(sort).
 		Limit(filter.GetLimit()).
 		Offset(filter.GetOffset()).
-		Order(filter.GetSort()).
-		Find(&inventories).Error
+		Scan(&views).Error
 
 	if err != nil {
 		return nil, 0, fmt.Errorf("inventory_repo.Find.Data: %w", err)
 	}
 
-	return inventories, total, nil
+	if len(views) > 0 {
+		var materialIDs []uuid.UUID
+		for _, v := range views {
+			materialIDs = append(materialIDs, v.MaterialID)
+		}
+
+		// Preload/Batch fetch UOMs with Unit details
+		var preloadedUOMs []struct {
+			domain.MaterialUOMView
+			MaterialID uuid.UUID `json:"material_id"`
+		}
+
+		err = r.db.WithContext(ctx).Table("material_uoms").
+			Select("material_uoms.id, material_uoms.unit_id, units.name as unit_name, material_uoms.multiplier, material_uoms.is_default, material_uoms.material_id").
+			Joins("JOIN units ON material_uoms.unit_id = units.id").
+			Where("material_uoms.material_id IN ? AND material_uoms.deleted_at IS NULL", materialIDs).
+			Scan(&preloadedUOMs).Error
+
+		if err != nil {
+			return nil, 0, fmt.Errorf("inventory_repo.Find.PreloadUOMs: %w", err)
+		}
+
+		// Group UOMs by material_id
+		uomsMap := make(map[uuid.UUID][]domain.MaterialUOMView)
+		for _, u := range preloadedUOMs {
+			uomsMap[u.MaterialID] = append(uomsMap[u.MaterialID], u.MaterialUOMView)
+		}
+
+		// Assign back to views
+		for i, v := range views {
+			if uoms, ok := uomsMap[v.MaterialID]; ok {
+				views[i].UOMs = uoms
+			} else {
+				views[i].UOMs = []domain.MaterialUOMView{}
+			}
+		}
+	}
+
+	return views, total, nil
 }
 
 func (r *inventoryRepository) GetSummary(ctx context.Context, branchID uuid.UUID, filter domain.InventoryFilter) ([]domain.MaterialStockView, int64, error) {

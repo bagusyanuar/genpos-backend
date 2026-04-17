@@ -17,7 +17,7 @@ type Material struct {
 	Description  *string        `gorm:"type:text" json:"description"`
 	MaterialType string         `gorm:"type:varchar(50)" json:"material_type"`
 	ImageURL     *string        `gorm:"type:text" json:"image_url"`
-	BaseCost     float64        `gorm:"type:decimal(15,2);not null;default:0" json:"base_cost"`
+	BaseCost     float64        `gorm:"type:decimal(15,4);not null;default:0" json:"base_cost"`
 	IsActive     bool           `gorm:"not null;default:true" json:"is_active"`
 	CreatedAt    time.Time      `json:"created_at"`
 	UpdatedAt    time.Time      `json:"updated_at"`

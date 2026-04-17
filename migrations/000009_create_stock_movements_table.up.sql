@@ -3,7 +3,7 @@ CREATE TABLE stock_movements (
     branch_id UUID NOT NULL,
     material_id UUID NOT NULL,
     type VARCHAR(20) NOT NULL, -- STOCK_IN, STOCK_OUT, ADJUSTMENT, DEDUCTION
-    quantity DECIMAL(15, 2) NOT NULL, -- Stored as positive quantity
+    quantity DECIMAL(15, 4) NOT NULL, -- Stored as positive quantity
     reference_id UUID, -- Link to Order or Opname
     note TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
