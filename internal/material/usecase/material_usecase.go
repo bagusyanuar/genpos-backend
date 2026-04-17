@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	inventoryDomain "github.com/bagusyanuar/genpos-backend/internal/inventory/domain"
 	"github.com/bagusyanuar/genpos-backend/internal/material/domain"
 	"github.com/bagusyanuar/genpos-backend/internal/shared/config"
 	"github.com/bagusyanuar/genpos-backend/pkg/fileupload"
@@ -12,20 +13,23 @@ import (
 )
 
 type materialUsecase struct {
-	materialRepo domain.MaterialRepository
-	uomRepo      domain.MaterialUOMRepository
-	uploader     fileupload.FileUploader
+	materialRepo  domain.MaterialRepository
+	uomRepo       domain.MaterialUOMRepository
+	inventoryRepo inventoryDomain.InventoryRepository
+	uploader      fileupload.FileUploader
 }
 
 func NewMaterialUsecase(
 	materialRepo domain.MaterialRepository,
 	uomRepo domain.MaterialUOMRepository,
+	inventoryRepo inventoryDomain.InventoryRepository,
 	uploader fileupload.FileUploader,
 ) domain.MaterialUsecase {
 	return &materialUsecase{
-		materialRepo: materialRepo,
-		uomRepo:      uomRepo,
-		uploader:     uploader,
+		materialRepo:  materialRepo,
+		uomRepo:       uomRepo,
+		inventoryRepo: inventoryRepo,
+		uploader:      uploader,
 	}
 }
 
@@ -103,8 +107,8 @@ func (u *materialUsecase) Update(ctx context.Context, material *domain.Material)
 	// 4. Image Cleanup: Delete old image ONLY if DB update succeeded and URL changed
 	if material.ImageURL != nil && existing.ImageURL != nil && *material.ImageURL != *existing.ImageURL {
 		if err := u.uploader.Delete(*existing.ImageURL); err != nil {
-			config.Log.Warn("failed to delete old image after successful update", 
-				zap.Error(err), 
+			config.Log.Warn("failed to delete old image after successful update",
+				zap.Error(err),
 				zap.String("url", *existing.ImageURL),
 			)
 		}
@@ -134,8 +138,8 @@ func (u *materialUsecase) UpdateImage(ctx context.Context, id uuid.UUID, imageUR
 	// 3. Delete old image ONLY if DB update succeeded
 	if oldURL != "" && oldURL != imageURL {
 		if err := u.uploader.Delete(oldURL); err != nil {
-			config.Log.Warn("failed to delete old image after successful patch", 
-				zap.Error(err), 
+			config.Log.Warn("failed to delete old image after successful patch",
+				zap.Error(err),
 				zap.String("url", oldURL),
 			)
 		}
@@ -159,8 +163,8 @@ func (u *materialUsecase) FindByID(ctx context.Context, id uuid.UUID) (*domain.M
 func (u *materialUsecase) Find(ctx context.Context, filter domain.MaterialFilter) ([]domain.Material, int64, error) {
 	materials, total, err := u.materialRepo.Find(ctx, filter)
 	if err != nil {
-		config.Log.Error("failed to find materials", 
-			zap.Error(err), 
+		config.Log.Error("failed to find materials",
+			zap.Error(err),
 			zap.String("search", filter.Search),
 		)
 		return nil, 0, fmt.Errorf("material_uc.Find: %w", err)
@@ -177,5 +181,96 @@ func (u *materialUsecase) Delete(ctx context.Context, id uuid.UUID) error {
 		)
 		return fmt.Errorf("material_uc.Delete: %w", err)
 	}
+	return nil
+}
+
+func (u *materialUsecase) RecalibrateUOM(ctx context.Context, materialID uuid.UUID, targetUOMID uuid.UUID, userID uuid.UUID) error {
+	// 1. Fetch current multipliers to find target CF
+	uoms, err := u.uomRepo.Find(ctx, materialID)
+	if err != nil {
+		return fmt.Errorf("material_uc.RecalibrateUOM.FindUOMs: %w", err)
+	}
+
+	var targetUOM *domain.MaterialUOM
+	for i := range uoms {
+		if uoms[i].ID == targetUOMID {
+			targetUOM = &uoms[i]
+			break
+		}
+	}
+
+	if targetUOM == nil {
+		return fmt.Errorf("target UOM not found for this material")
+	}
+
+	if targetUOM.IsDefault {
+		return fmt.Errorf("target UOM is already the default (Base Unit)")
+	}
+
+	// 2. Fetch Material to get current base cost
+	material, err := u.materialRepo.FindByID(ctx, materialID)
+	if err != nil {
+		return fmt.Errorf("material_uc.RecalibrateUOM.FindMaterial: %w", err)
+	}
+
+	// 3. Mathematical Recalibration
+	cf := targetUOM.Multiplier
+	if cf <= 0 {
+		return fmt.Errorf("invalid conversion factor: %.4f", cf)
+	}
+
+	// 4. Execute Transaction
+	tx := u.materialRepo.GetDB().Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	// 4a. Normalise Multipliers (Optimized: Single query)
+	if err := u.uomRepo.RecalibrateUOMs(ctx, tx, materialID, cf, targetUOMID); err != nil {
+		tx.Rollback()
+		return fmt.Errorf("material_uc.RecalibrateUOM.UpdateUOMs: %w", err)
+	}
+
+	// 4b. Convert Inventories Stock & Min Stock
+	if err := u.inventoryRepo.RecalibrateStock(ctx, tx, materialID, cf); err != nil {
+		tx.Rollback()
+		return fmt.Errorf("material_uc.RecalibrateUOM.UpdateStock: %w", err)
+	}
+
+	// 4c. Convert Material Base Cost
+	newBaseCost := material.BaseCost * cf
+	if err := tx.WithContext(ctx).Model(material).Update("base_cost", newBaseCost).Error; err != nil {
+		tx.Rollback()
+		return fmt.Errorf("material_uc.RecalibrateUOM.UpdateCost: %w", err)
+	}
+
+	// 4d. Record Audit Trail in StockMovement
+	move := inventoryDomain.StockMovement{
+		BranchID:   uuid.Nil, // System-wide recalibration
+		MaterialID: materialID,
+		Type:       inventoryDomain.MovementAdjust,
+		Quantity:   0, // Logical conversion, not physical movement
+		Note:       fmt.Sprintf("[RECALIBRATION] Base UOM changed to %s. CF: %.4f. Cost: %.2f -> %.2f", targetUOMID, cf, material.BaseCost, newBaseCost),
+		CreatedBy:  userID,
+	}
+	if err := tx.WithContext(ctx).Create(&move).Error; err != nil {
+		tx.Rollback()
+		return fmt.Errorf("material_uc.RecalibrateUOM.AuditLog: %w", err)
+	}
+
+	// 5. Commit
+	if err := tx.Commit().Error; err != nil {
+		return fmt.Errorf("material_uc.RecalibrateUOM.Commit: %w", err)
+	}
+
+	config.Log.Info("Material UOM Recalibrated successfully",
+		zap.String("material_id", materialID.String()),
+		zap.String("target_uom_id", targetUOMID.String()),
+		zap.Float64("cf", cf),
+		zap.String("user_id", userID.String()),
+	)
+
 	return nil
 }

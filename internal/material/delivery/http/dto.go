@@ -165,3 +165,7 @@ func (r *UpdateMaterialRequest) ToEntity(id uuid.UUID) *domain.Material {
 type PatchMaterialImageRequest struct {
 	ImageURL string `json:"image_url" validate:"required"`
 }
+
+type RecalibrateUOMRequest struct {
+	TargetUOMID uuid.UUID `json:"target_uom_id" validate:"required"`
+}

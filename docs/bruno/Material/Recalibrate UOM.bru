@@ -1,0 +1,42 @@
+meta {
+  name: Recalibrate UOM
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{host}}/materials/:id/recalibrate
+  body: json
+  auth: bearer
+}
+
+params:path {
+  id: 
+}
+
+auth:bearer {
+  token: {{auth_token}}
+}
+
+body:json {
+  {
+    "target_uom_id": ""
+  }
+}
+
+docs {
+  ### Recalibrate UOM
+  Dangerous operation to change the Base Unit of Measure (Base UOM) of a Material.
+  
+  System will:
+  1. Recalculate all UOM multipliers relative to the new Target UOM.
+  2. Convert existing inventory stock quantities across all branches.
+  3. Convert the material's base cost.
+  4. Record a recalibration audit in stock movements.
+  
+  #### Request Body
+  - `target_uom_id`: UUID of the Material UOM to become the new Base Unit.
+  
+  #### Response
+  - `200 OK`: If recalibration succeeded.
+}

@@ -3,6 +3,8 @@ package repository
 import (
 	"context"
 	"fmt"
+	"time"
+
 	"github.com/bagusyanuar/genpos-backend/internal/material/domain"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -70,4 +72,25 @@ func (r *materialUOMRepository) ReplaceUOMs(ctx context.Context, materialID uuid
 
 		return nil
 	})
+}
+
+func (r *materialUOMRepository) RecalibrateUOMs(ctx context.Context, tx *gorm.DB, materialID uuid.UUID, cf float64, targetUOMID uuid.UUID) error {
+	if tx == nil {
+		tx = r.db
+	}
+
+	// Bulk update multipliers and is_default
+	err := tx.WithContext(ctx).Model(&domain.MaterialUOM{}).
+		Where("material_id = ?", materialID).
+		Updates(map[string]interface{}{
+			"multiplier": gorm.Expr("multiplier / ?", cf),
+			"is_default": gorm.Expr("id = ?", targetUOMID),
+			"updated_at": time.Now(),
+		}).Error
+
+	if err != nil {
+		return fmt.Errorf("material_uom_repo.RecalibrateUOMs: %w", err)
+	}
+
+	return nil
 }

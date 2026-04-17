@@ -168,3 +168,24 @@ func (r *inventoryRepository) GetStockMovements(ctx context.Context, filter doma
 
 	return movements, total, nil
 }
+
+func (r *inventoryRepository) RecalibrateStock(ctx context.Context, tx *gorm.DB, materialID uuid.UUID, cf float64) error {
+	if tx == nil {
+		tx = r.db
+	}
+
+	// Update stock and min_stock for all records matching material_id
+	err := tx.WithContext(ctx).Model(&domain.Inventory{}).
+		Where("material_id = ?", materialID).
+		Updates(map[string]interface{}{
+			"stock":      gorm.Expr("stock / ?", cf),
+			"min_stock":  gorm.Expr("min_stock / ?", cf),
+			"updated_at": time.Now(),
+		}).Error
+
+	if err != nil {
+		return fmt.Errorf("inventory_repo.RecalibrateStock: %w", err)
+	}
+
+	return nil
+}

@@ -52,6 +52,7 @@ type MaterialUsecase interface {
 	Update(ctx context.Context, material *Material) error
 	UpdateImage(ctx context.Context, id uuid.UUID, imageURL string) error
 	Delete(ctx context.Context, id uuid.UUID) error
+	RecalibrateUOM(ctx context.Context, materialID uuid.UUID, targetUOMID uuid.UUID, userID uuid.UUID) error
 }
 
 type MaterialUOM struct {
@@ -76,6 +77,7 @@ type MaterialUOMRepository interface {
 	Find(ctx context.Context, materialID uuid.UUID) ([]MaterialUOM, error)
 	CreateBatch(ctx context.Context, uoms []MaterialUOM) error
 	ReplaceUOMs(ctx context.Context, materialID uuid.UUID, uoms []MaterialUOM) error
+	RecalibrateUOMs(ctx context.Context, tx *gorm.DB, materialID uuid.UUID, cf float64, targetUOMID uuid.UUID) error
 }
 
 type MaterialUOMUsecase interface {

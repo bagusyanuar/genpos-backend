@@ -68,6 +68,7 @@ type InventoryRepository interface {
 	// quantity can be positive (increment) or negative (decrement).
 	UpdateStock(ctx context.Context, move StockMovement) error
 	GetStockMovements(ctx context.Context, filter InventoryFilter) ([]StockMovement, int64, error)
+	RecalibrateStock(ctx context.Context, tx *gorm.DB, materialID uuid.UUID, cf float64) error
 }
 
 type InventoryUsecase interface {

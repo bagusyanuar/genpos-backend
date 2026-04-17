@@ -37,6 +37,7 @@ func (h *MaterialHandler) Register(router fiber.Router, authMiddleware fiber.Han
 	group.Patch("/:id/image", h.PatchImage)
 	group.Delete("/:id", h.Delete)
 	group.Put("/:id/uoms", h.SyncUOMs)
+	group.Post("/:id/recalibrate", h.Recalibrate)
 }
 
 func (h *MaterialHandler) Create(c *fiber.Ctx) error {
@@ -225,4 +226,38 @@ func (h *MaterialHandler) Delete(c *fiber.Ctx) error {
 	}
 
 	return c.Status(fiber.StatusOK).JSON(response.Success[any](nil, "material deleted successfully"))
+}
+
+func (h *MaterialHandler) Recalibrate(c *fiber.Ctx) error {
+	idStr := c.Params("id")
+	materialID, err := uuid.Parse(idStr)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(response.Error("invalid material id format"))
+	}
+
+	var req RecalibrateUOMRequest
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(response.Error("invalid request body"))
+	}
+
+	if errs := validator.Validate(req); errs != nil {
+		return c.Status(fiber.StatusUnprocessableEntity).JSON(response.ValidationError(errs))
+	}
+
+	// Extract userID from context (set by auth middleware)
+	userIDStr, ok := c.Locals("user_id").(string)
+	if !ok {
+		return c.Status(fiber.StatusUnauthorized).JSON(response.Error("unauthorized: missing user information"))
+	}
+	userID, err := uuid.Parse(userIDStr)
+	if err != nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(response.Error("unauthorized: invalid user id format"))
+	}
+
+	if err := h.uc.RecalibrateUOM(c.Context(), materialID, req.TargetUOMID, userID); err != nil {
+		config.Log.Error("handler.Recalibrate error", zap.Error(err), zap.String("material_id", idStr))
+		return c.Status(fiber.StatusInternalServerError).JSON(response.Error(err.Error()))
+	}
+
+	return c.Status(fiber.StatusOK).JSON(response.Success[any](nil, "material recalibrated successfully"))
 }
