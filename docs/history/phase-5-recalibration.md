@@ -18,12 +18,12 @@ This operation must be executed within a **single, strict database transaction**
 - **User Action**: Make `Kg` the new Base Unit.
 
 ### Execution Steps:
-- [ ] **Find Conversion Factor (CF)**: Get the current `multiplier` of the target UOM. 
-- [ ] **Re-normalize Multipliers (`material_uoms`)**: Divide all existing multipliers belonging to this material by the CF.
-- [ ] **Convert Remaining Stock (`inventories`)**: Update `New Stock = Old Stock / CF`.
-- [ ] **Convert Moving Average Cost (`materials.base_cost`)**: Update `New Base Cost = Old Base Cost * CF`.
-- [ ] **Verify Impact on Recipes (`recipes`)**: No Action Needed (relies on `uom_id`).
-- [ ] **Verify Impact on Past Sales (`order_items`)**: No Action Needed (relies on hardcoded COGS).
+- [x] **Find Conversion Factor (CF)**: Get the current `multiplier` of the target UOM. 
+- [x] **Re-normalize Multipliers (`material_uoms`)**: Divide all existing multipliers belonging to this material by the CF.
+- [x] **Convert Remaining Stock (`inventories`)**: Update `New Stock = Old Stock / CF`.
+- [x] **Convert Moving Average Cost (`materials.base_cost`)**: Update `New Base Cost = Old Base Cost * CF`.
+- [x] **Verify Impact on Recipes (`recipes`)**: No Action Needed (relies on `uom_id`).
+- [x] **Verify Impact on Past Sales (`order_items`)**: No Action Needed (relies on hardcoded COGS).
 
 ## Requirements
 - This feature should be heavily restricted (Superadmin/Manager only).

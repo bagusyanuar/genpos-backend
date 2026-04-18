@@ -16,6 +16,7 @@ type materialUsecase struct {
 	materialRepo  domain.MaterialRepository
 	uomRepo       domain.MaterialUOMRepository
 	inventoryRepo inventoryDomain.InventoryRepository
+	auditRepo     domain.MaterialAuditRepository
 	uploader      fileupload.FileUploader
 }
 
@@ -23,12 +24,14 @@ func NewMaterialUsecase(
 	materialRepo domain.MaterialRepository,
 	uomRepo domain.MaterialUOMRepository,
 	inventoryRepo inventoryDomain.InventoryRepository,
+	auditRepo domain.MaterialAuditRepository,
 	uploader fileupload.FileUploader,
 ) domain.MaterialUsecase {
 	return &materialUsecase{
 		materialRepo:  materialRepo,
 		uomRepo:       uomRepo,
 		inventoryRepo: inventoryRepo,
+		auditRepo:     auditRepo,
 		uploader:      uploader,
 	}
 }
@@ -246,16 +249,14 @@ func (u *materialUsecase) RecalibrateUOM(ctx context.Context, materialID uuid.UU
 		return fmt.Errorf("material_uc.RecalibrateUOM.UpdateCost: %w", err)
 	}
 
-	// 4d. Record Audit Trail in StockMovement
-	move := inventoryDomain.StockMovement{
-		BranchID:   uuid.Nil, // System-wide recalibration
+	// 4d. Record Audit Trail in MaterialAudit
+	audit := &domain.MaterialAudit{
 		MaterialID: materialID,
-		Type:       inventoryDomain.MovementAdjust,
-		Quantity:   0, // Logical conversion, not physical movement
-		Note:       fmt.Sprintf("[RECALIBRATION] Base UOM changed to %s. CF: %.4f. Cost: %.2f -> %.2f", targetUOMID, cf, material.BaseCost, newBaseCost),
+		Action:     "RECALIBRATE",
+		Note:       fmt.Sprintf("Base UOM changed. CF: %.4f. Cost: %.2f -> %.2f", cf, material.BaseCost, newBaseCost),
 		CreatedBy:  userID,
 	}
-	if err := tx.WithContext(ctx).Create(&move).Error; err != nil {
+	if err := tx.WithContext(ctx).Create(audit).Error; err != nil {
 		tx.Rollback()
 		return fmt.Errorf("material_uc.RecalibrateUOM.AuditLog: %w", err)
 	}

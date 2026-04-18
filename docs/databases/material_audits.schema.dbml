@@ -1,0 +1,15 @@
+Table material_audits {
+  id uuid [pk]
+  material_id uuid [not null]
+  action varchar(50) [not null, note: "e.g. RECALIBRATE, UPDATE_PRICE"]
+  note text
+  created_by uuid [not null]
+  created_at timestamp [default: `now()`]
+
+  Indexes {
+    material_id [name: "idx_material_audits_material_id"]
+    action [name: "idx_material_audits_action"]
+  }
+}
+
+Ref: material_audits.material_id > materials.id

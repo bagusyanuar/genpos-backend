@@ -79,17 +79,25 @@ func (r *materialUOMRepository) RecalibrateUOMs(ctx context.Context, tx *gorm.DB
 		tx = r.db
 	}
 
-	// Bulk update multipliers and is_default
+	// 1. Reset all is_default to false first to avoid unique constraint violation
+	// during the row-by-row bulk update process.
+	if err := tx.WithContext(ctx).Model(&domain.MaterialUOM{}).
+		Where("material_id = ?", materialID).
+		Update("is_default", false).Error; err != nil {
+		return fmt.Errorf("material_uom_repo.RecalibrateUOMs.ResetDefault: %w", err)
+	}
+
+	// 2. Bulk update multipliers and set the target default
 	err := tx.WithContext(ctx).Model(&domain.MaterialUOM{}).
 		Where("material_id = ?", materialID).
-		Updates(map[string]interface{}{
+		Updates(map[string]any{
 			"multiplier": gorm.Expr("multiplier / ?", cf),
 			"is_default": gorm.Expr("id = ?", targetUOMID),
 			"updated_at": time.Now(),
 		}).Error
 
 	if err != nil {
-		return fmt.Errorf("material_uom_repo.RecalibrateUOMs: %w", err)
+		return fmt.Errorf("material_uom_repo.RecalibrateUOMs.UpdateData: %w", err)
 	}
 
 	return nil
