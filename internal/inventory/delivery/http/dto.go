@@ -19,16 +19,20 @@ type MaterialUOMResponse struct {
 	Stock      float64   `json:"stock"`
 }
 
+type InventoryMaterialResponse struct {
+	ID   uuid.UUID `json:"id"`
+	SKU  string    `json:"sku"`
+	Name string    `json:"name"`
+}
+
 type InventoryResponse struct {
-	ID             *uuid.UUID            `json:"inventory_id"`
-	MaterialID     uuid.UUID             `json:"material_id"`
-	MaterialSKU    string                `json:"material_sku"`
-	MaterialName   string                `json:"material_name"`
-	Stock          float64               `json:"stock"`
-	FormattedStock []string              `json:"formatted_stock"`
-	MinStock       float64               `json:"min_stock"`
-	UpdatedAt      *time.Time            `json:"updated_at"`
-	UOMs           []MaterialUOMResponse `json:"uoms"`
+	ID             *uuid.UUID                `json:"inventory_id"`
+	Material       InventoryMaterialResponse `json:"material"`
+	Stock          float64                   `json:"stock"`
+	FormattedStock []string                  `json:"formatted_stock"`
+	MinStock       float64                   `json:"min_stock"`
+	UpdatedAt      *time.Time                `json:"updated_at"`
+	UOMs           []MaterialUOMResponse     `json:"uoms"`
 }
 
 func formatStock(baseStock float64, uoms []domain.MaterialUOMView) []string {
@@ -100,10 +104,12 @@ func ToInventoryResponse(v domain.MaterialInventoryView) InventoryResponse {
 	}
 
 	return InventoryResponse{
-		ID:             v.ID,
-		MaterialID:     v.MaterialID,
-		MaterialSKU:    v.MaterialSKU,
-		MaterialName:   v.MaterialName,
+		ID: v.ID,
+		Material: InventoryMaterialResponse{
+			ID:   v.MaterialID,
+			SKU:  v.MaterialSKU,
+			Name: v.MaterialName,
+		},
 		Stock:          v.Stock,
 		FormattedStock: formatStock(v.Stock, v.UOMs),
 		MinStock:       v.MinStock,
@@ -163,6 +169,29 @@ func ToStockMovementListResponse(movements []domain.StockMovement) []StockMoveme
 	res := make([]StockMovementResponse, 0)
 	for _, m := range movements {
 		res = append(res, ToStockMovementResponse(m))
+	}
+	return res
+}
+type InventorySummaryResponse struct {
+	Material   InventoryMaterialResponse `json:"material"`
+	TotalStock float64                   `json:"total_stock"`
+}
+
+func ToInventorySummaryResponse(v domain.MaterialStockView) InventorySummaryResponse {
+	return InventorySummaryResponse{
+		Material: InventoryMaterialResponse{
+			ID:   v.ID,
+			SKU:  v.SKU,
+			Name: v.Name,
+		},
+		TotalStock: v.TotalStock,
+	}
+}
+
+func ToInventorySummaryListResponse(views []domain.MaterialStockView) []InventorySummaryResponse {
+	res := make([]InventorySummaryResponse, 0)
+	for _, v := range views {
+		res = append(res, ToInventorySummaryResponse(v))
 	}
 	return res
 }

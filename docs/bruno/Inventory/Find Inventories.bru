@@ -49,3 +49,77 @@ docs {
   }
   ```
 }
+
+example {
+  name: 200 succes
+  
+  request: {
+    url: {{host}}/inventories?branch_id=aebe8670-b513-4ff2-854b-d70521bcf85b&search=&page=1&limit=10
+    method: GET
+    mode: none
+    params:query: {
+      branch_id: aebe8670-b513-4ff2-854b-d70521bcf85b
+      search: 
+      page: 1
+      limit: 10
+    }
+  }
+  
+  response: {
+    status: {
+      code: 200
+      text: OK
+    }
+  
+    body: {
+      type: text
+      content: '''
+        {
+          "success": true,
+          "message": "inventories found successfully",
+          "data": [
+            {
+              "inventory_id": "225ab79f-f120-49a2-a00a-77d7345464c9",
+              "material": {
+                "id": "5b97b85d-7323-4241-ae6b-1ac3d3ea5872",
+                "sku": "MAT-FM-01",
+                "name": "Greenfield Fresh Milk"
+              },
+              "stock": 2.25,
+              "formatted_stock": [
+                "2 Liter",
+                "250 Mililiter"
+              ],
+              "min_stock": 0,
+              "updated_at": "2026-04-17T22:10:45.938503+07:00",
+              "uoms": [
+                {
+                  "id": "dff218e7-bea5-48a1-8efb-c5d7548109dc",
+                  "unit_id": "4400d178-2148-4ce8-9e55-cac476241626",
+                  "unit_name": "Mililiter",
+                  "multiplier": 0.001,
+                  "is_default": false,
+                  "stock": 2250
+                },
+                {
+                  "id": "ef9d40ce-d9b4-4674-99e0-84f4e62122a1",
+                  "unit_id": "537a762f-df02-4b57-a984-e3ae8f7586ed",
+                  "unit_name": "Liter",
+                  "multiplier": 1,
+                  "is_default": true,
+                  "stock": 2.25
+                }
+              ]
+            }
+          ],
+          "pagination": {
+            "current_page": 1,
+            "total_page": 1,
+            "total_data": 1,
+            "limit": 10
+          }
+        }
+      '''
+    }
+  }
+}

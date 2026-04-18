@@ -148,6 +148,8 @@ func (h *InventoryHandler) GetSummary(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).JSON(response.Error(err.Error()))
 	}
 
+	res := ToInventorySummaryListResponse(views)
+
 	pagination := response.Pagination{
 		CurrentPage: query.GetPage(),
 		Limit:       query.GetLimit(),
@@ -155,7 +157,7 @@ func (h *InventoryHandler) GetSummary(c *fiber.Ctx) error {
 		TotalPage:   int((total + int64(query.GetLimit()) - 1) / int64(query.GetLimit())),
 	}
 
-	return c.Status(fiber.StatusOK).JSON(response.SuccessWithPagination(views, pagination, "inventory summary found successfully"))
+	return c.Status(fiber.StatusOK).JSON(response.SuccessWithPagination(res, pagination, "inventory summary found successfully"))
 }
 
 func (h *InventoryHandler) AdjustStock(c *fiber.Ctx) error {
