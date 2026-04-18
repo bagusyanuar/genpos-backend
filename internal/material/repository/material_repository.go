@@ -45,7 +45,7 @@ func (r *materialRepository) Update(ctx context.Context, material *domain.Materi
 
 func (r *materialRepository) FindByID(ctx context.Context, id uuid.UUID) (*domain.Material, error) {
 	var material domain.Material
-	err := r.db.WithContext(ctx).First(&material, "id = ?", id).Error
+	err := r.db.WithContext(ctx).Preload("UOMs.Unit").First(&material, "id = ?", id).Error
 	if err != nil {
 		return nil, fmt.Errorf("material_repo.FindByID: %w", err)
 	}
@@ -79,6 +79,7 @@ func (r *materialRepository) Find(ctx context.Context, filter domain.MaterialFil
 
 	// Pagination & Sorting
 	err := query.
+		Preload("UOMs.Unit").
 		Limit(filter.GetLimit()).
 		Offset(filter.GetOffset()).
 		Order(filter.GetSort()).

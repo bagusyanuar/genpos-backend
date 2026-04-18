@@ -5,13 +5,13 @@ meta {
 }
 
 get {
-  url: {{host}}/categories?type=MATERIAL&search=&page=1&limit=10
+  url: {{host}}/categories?type=INGREDIENT&search=&page=1&limit=10
   body: none
   auth: bearer
 }
 
-query {
-  type: MATERIAL
+params:query {
+  type: INGREDIENT
   search: 
   page: 1
   limit: 10

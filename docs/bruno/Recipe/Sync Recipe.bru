@@ -11,7 +11,7 @@ post {
 }
 
 params:path {
-  variant_id: 
+  variant_id: d35da622-5a25-4522-a6e9-b03c783667dc
 }
 
 auth:bearer {
@@ -22,10 +22,16 @@ body:json {
   {
     "recipes": [
       {
-        "material_id": "uuid-material-1",
-        "uom_id": "uuid-uom-1",
-        "quantity": 2.5,
-        "subtotal_cost": 0
+        "material_id": "5b97b85d-7323-4241-ae6b-1ac3d3ea5872",
+        "material_uom_id": "dff218e7-bea5-48a1-8efb-c5d7548109dc",
+        "quantity": 120,
+        "subtotal_cost": 2200
+      },
+      {
+        "material_id": "c7bc496f-c82c-425a-8072-44ffb22b86de",
+        "material_uom_id": "7631eba0-1302-4b95-94c3-9b3b0bbd4dbf",
+        "quantity": 20,
+        "subtotal_cost": 1500
       }
     ]
   }
@@ -42,7 +48,7 @@ docs {
     "data": null
   }
   ```
-
+  
   #### 🔴 400 Bad Request
   ```json
   {
@@ -53,7 +59,7 @@ docs {
     }
   }
   ```
-
+  
   #### 🔴 401 Unauthorized
   ```json
   {

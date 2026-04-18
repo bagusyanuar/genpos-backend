@@ -22,6 +22,8 @@ type Material struct {
 	CreatedAt    time.Time      `json:"created_at"`
 	UpdatedAt    time.Time      `json:"updated_at"`
 	DeletedAt    gorm.DeletedAt `gorm:"index" json:"deleted_at,omitempty"`
+
+	UOMs []MaterialUOM `gorm:"foreignKey:MaterialID" json:"uoms"`
 }
 
 func (m *Material) BeforeCreate(tx *gorm.DB) (err error) {

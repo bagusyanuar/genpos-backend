@@ -7,7 +7,7 @@ import (
 
 type RecipeItemRequest struct {
 	MaterialID   uuid.UUID `json:"material_id" validate:"required"`
-	UomID        uuid.UUID `json:"uom_id" validate:"required"`
+	MaterialUOMID uuid.UUID `json:"material_uom_id" validate:"required"`
 	Quantity     float64   `json:"quantity" validate:"required,gt=0"`
 	SubtotalCost float64   `json:"subtotal_cost"`
 }
@@ -18,10 +18,10 @@ type SyncRecipeRequest struct {
 
 func (r RecipeItemRequest) ToEntity() domain.Recipe {
 	return domain.Recipe{
-		MaterialID:   r.MaterialID,
-		UomID:        r.UomID,
-		Quantity:     r.Quantity,
-		SubtotalCost: r.SubtotalCost,
+		MaterialID:    r.MaterialID,
+		MaterialUOMID: r.MaterialUOMID,
+		Quantity:      r.Quantity,
+		SubtotalCost:  r.SubtotalCost,
 	}
 }
 
@@ -29,7 +29,7 @@ type RecipeResponse struct {
 	ID               uuid.UUID `json:"id"`
 	ProductVariantID uuid.UUID `json:"product_variant_id"`
 	MaterialID       uuid.UUID `json:"material_id"`
-	UomID            uuid.UUID `json:"uom_id"`
+	MaterialUOMID    uuid.UUID `json:"material_uom_id"`
 	Quantity         float64   `json:"quantity"`
 	SubtotalCost     float64   `json:"subtotal_cost"`
 }
@@ -39,7 +39,7 @@ func ToRecipeResponse(r domain.Recipe) RecipeResponse {
 		ID:               r.ID,
 		ProductVariantID: r.ProductVariantID,
 		MaterialID:       r.MaterialID,
-		UomID:            r.UomID,
+		MaterialUOMID:    r.MaterialUOMID,
 		Quantity:         r.Quantity,
 		SubtotalCost:     r.SubtotalCost,
 	}

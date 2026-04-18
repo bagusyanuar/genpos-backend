@@ -19,7 +19,7 @@ func NewRecipeRepository(db *gorm.DB) domain.RecipeRepository {
 
 func (r *recipeRepository) FindByVariantID(ctx context.Context, variantID uuid.UUID) ([]domain.Recipe, error) {
 	var recipes []domain.Recipe
-	err := r.db.WithContext(ctx).Find(&recipes, "product_variant_id = ?", variantID).Error
+	err := r.db.WithContext(ctx).Preload("MaterialUOM").Find(&recipes, "product_variant_id = ?", variantID).Error
 	if err != nil {
 		return nil, fmt.Errorf("recipe_repo.FindByVariantID: %w", err)
 	}

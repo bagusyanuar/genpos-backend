@@ -8,17 +8,18 @@ import (
 )
 
 type MaterialResponse struct {
-	ID           uuid.UUID `json:"id"`
-	CategoryID   *uuid.UUID `json:"category_id"`
-	SKU          string    `json:"sku"`
-	Name         string    `json:"name"`
-	Description  *string   `json:"description"`
-	MaterialType string    `json:"material_type"`
-	ImageURL     *string   `json:"image_url"`
-	BaseCost     float64   `json:"base_cost"`
-	IsActive     bool      `json:"is_active"`
-	CreatedAt    time.Time `json:"created_at"`
-	UpdatedAt    time.Time `json:"updated_at"`
+	ID           uuid.UUID             `json:"id"`
+	CategoryID   *uuid.UUID            `json:"category_id"`
+	SKU          string                `json:"sku"`
+	Name         string                `json:"name"`
+	Description  *string               `json:"description"`
+	MaterialType string                `json:"material_type"`
+	ImageURL     *string               `json:"image_url"`
+	BaseCost     float64               `json:"base_cost"`
+	IsActive     bool                  `json:"is_active"`
+	CreatedAt    time.Time             `json:"created_at"`
+	UpdatedAt    time.Time             `json:"updated_at"`
+	UOMs         []MaterialUOMResponse `json:"uoms,omitempty"`
 }
 
 type CreateMaterialUOMRequest struct {
@@ -73,6 +74,7 @@ func ToMaterialResponse(m domain.Material) MaterialResponse {
 		IsActive:     m.IsActive,
 		CreatedAt:    m.CreatedAt,
 		UpdatedAt:    m.UpdatedAt,
+		UOMs:         ToMaterialUOMListResponse(m.UOMs),
 	}
 }
 
@@ -88,6 +90,7 @@ type MaterialUOMResponse struct {
 	ID         uuid.UUID `json:"id"`
 	MaterialID uuid.UUID `json:"material_id"`
 	UnitID     uuid.UUID `json:"unit_id"`
+	UnitName   string    `json:"unit_name"`
 	Multiplier float64   `json:"multiplier"`
 	IsDefault  bool      `json:"is_default"`
 	CreatedAt  time.Time `json:"created_at"`
@@ -99,6 +102,7 @@ func ToMaterialUOMResponse(m domain.MaterialUOM) MaterialUOMResponse {
 		ID:         m.ID,
 		MaterialID: m.MaterialID,
 		UnitID:     m.UnitID,
+		UnitName:   m.Unit.Name,
 		Multiplier: m.Multiplier,
 		IsDefault:  m.IsDefault,
 		CreatedAt:  m.CreatedAt,

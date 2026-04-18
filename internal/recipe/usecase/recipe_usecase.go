@@ -69,7 +69,10 @@ func (u *recipeUsecase) CalculateEstimatedCOGS(ctx context.Context, variantID uu
 			if err != nil {
 				return 0, fmt.Errorf("recipe_uc.CalculateCOGS.GetMaterial %s: %w", r.MaterialID, err)
 			}
-			itemCost = r.Quantity * material.BaseCost
+			
+			// COGS = Quantity * (BaseCost * Multiplier)
+			// BaseCost is cost per base unit. Multiplier is how many base units in this UOM.
+			itemCost = r.Quantity * (material.BaseCost * r.MaterialUOM.Multiplier)
 		}
 
 		totalCOGS += itemCost

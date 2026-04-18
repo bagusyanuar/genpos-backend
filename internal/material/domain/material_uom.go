@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	unitDomain "github.com/bagusyanuar/genpos-backend/internal/unit/domain"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
@@ -12,6 +13,7 @@ type MaterialUOM struct {
 	ID         uuid.UUID      `gorm:"type:uuid;primaryKey" json:"id"`
 	MaterialID uuid.UUID      `gorm:"type:uuid;not null;index" json:"material_id"`
 	UnitID     uuid.UUID      `gorm:"type:uuid;not null" json:"unit_id"`
+	Unit       unitDomain.Unit `gorm:"foreignKey:UnitID" json:"unit"`
 	Multiplier float64        `gorm:"type:decimal(15,4);not null;default:1" json:"multiplier"`
 	IsDefault  bool           `gorm:"not null;default:false" json:"is_default"`
 	CreatedAt  time.Time      `json:"created_at"`
