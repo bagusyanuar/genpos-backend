@@ -1,0 +1,36 @@
+meta {
+  name: Get Product by ID
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{host}}/products/:id
+  body: none
+  auth: bearer
+}
+
+params:path {
+  id: 
+}
+
+auth:bearer {
+  token: {{auth_token}}
+}
+
+docs {
+  ### Response Examples
+  
+  #### 🟢 200 OK
+  ```json
+  {
+    "success": true,
+    "message": "product found successfully",
+    "data": {
+      "id": "uuid-product",
+      "name": "Americano",
+      "variants": [...]
+    }
+  }
+  ```
+}

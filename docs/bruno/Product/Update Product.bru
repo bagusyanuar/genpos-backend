@@ -1,0 +1,54 @@
+meta {
+  name: Update Product
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{host}}/products/:id
+  body: json
+  auth: bearer
+}
+
+params:path {
+  id: 
+}
+
+auth:bearer {
+  token: {{auth_token}}
+}
+
+body:json {
+  {
+    "name": "Americano Updated",
+    "description": "Black coffee with water",
+    "category_id": "uuid-category",
+    "is_active": true,
+    "variants": [
+      {
+        "name": "Regular",
+        "sku": "PRD-COF-01-REG",
+        "price": 27000,
+        "is_active": true
+      }
+    ],
+    "branch_ids": ["uuid-branch-1"]
+  }
+}
+
+docs {
+  ### Response Examples
+  
+  #### 🟢 200 OK
+  ```json
+  {
+    "success": true,
+    "message": "product updated successfully",
+    "data": {
+      "id": "uuid-product",
+      "name": "Americano Updated",
+      "variants": [...]
+    }
+  }
+  ```
+}

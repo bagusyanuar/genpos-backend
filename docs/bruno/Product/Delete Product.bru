@@ -1,0 +1,32 @@
+meta {
+  name: Delete Product
+  type: http
+  seq: 6
+}
+
+delete {
+  url: {{host}}/products/:id
+  body: none
+  auth: bearer
+}
+
+params:path {
+  id: 
+}
+
+auth:bearer {
+  token: {{auth_token}}
+}
+
+docs {
+  ### Response Examples
+  
+  #### 🟢 200 OK
+  ```json
+  {
+    "success": true,
+    "message": "product deleted successfully",
+    "data": null
+  }
+  ```
+}
